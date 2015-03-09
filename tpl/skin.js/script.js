@@ -183,15 +183,10 @@ function addItemsToFavorites(item_srl) {
 		{
 			r_load_favorites('wish');
 		}
-/*
-		if (confirm('관심상품에 추가하였습니다. 관심상품으로 이동하시겠습니까?')) {
-			//location.href = current_url.setQuery('act','dispNstore_digitalFavoriteItems');
-		}
-*/
 
 		if(jQuery("#is_mobile").val() == "true")
 		{
-			if (confirm('관심상품에 추가하였습니다. 관심상품으로 이동하시겠습니까?')) 
+			if (confirm(xe.lang.msg_added_to_favorite_list)) 
 			{
 				mid = jQuery("#ncart_mid").val();
 				current_url = current_url.setQuery('document_srl', '');

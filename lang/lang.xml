@@ -688,24 +688,41 @@
         <item name="list_order">
 		<value xml:lang="ko"><![CDATA[순서]]></value>
 		<value xml:lang="en"><![CDATA[Order]]></value>
-		<value xml:lang="zh-TW"><![CDATA[項目]]></value>
+		<value xml:lang="zh-TW"><![CDATA[排序]]></value>
 	</item>
         <item name="force_purchase">
         	<value xml:lang="ko"><![CDATA[필수주문]]></value>
-		<value xml:lang="en"><![CDATA[Force purchasing]]></value>
+		   <value xml:lang="en"><![CDATA[Force purchasing]]></value>
+		   <value xml:lang="zh-TW"><![CDATA[強制購買]]></value>
 	</item>
         <item name="product_picker">
         	<value xml:lang="ko"><![CDATA[상품선택]]></value>
 		<value xml:lang="en"><![CDATA[Product Picker]]></value>
+		<value xml:lang="zh-TW"><![CDATA[項目選擇]]></value>
 	</item>
         <item name="related_items">
         	<value xml:lang="ko"><![CDATA[관련상품]]></value>
 		<value xml:lang="en"><![CDATA[Related items]]></value>
+		<value xml:lang="zh-TW"><![CDATA[相關項目]]></value>
 	</item>
         <item name="minimum_order_quantity">
         	<value xml:lang="ko"><![CDATA[관련상품 최소구매수량]]></value>
 		<value xml:lang="en"><![CDATA[Minimum order quantity of related items]]></value>
+		<value xml:lang="zh-TW"><![CDATA[商品最低購買數量]]></value>
 	</item>
+	<item name="remaining_quantity">
+        	<value xml:lang="ko"><![CDATA[남은 수량]]></value>
+		<value xml:lang="en"><![CDATA[Remaining quantity]]></value>
+		<value xml:lang="zh-TW"><![CDATA[Remaining quantity]]></value>
+		<value xml:lang="zh-TW"><![CDATA[剩餘數量]]></value>
+	</item>
+	<item name="product_detailed_description">
+        	<value xml:lang="ko"><![CDATA[상품 상세 설명]]></value>
+		<value xml:lang="en"><![CDATA[Product Detailed Description]]></value>
+		<value xml:lang="zh-TW"><![CDATA[Product Detailed Description]]></value>
+		<value xml:lang="zh-TW"><![CDATA[產品詳細信息]]></value>
+	</item>
+
 
 	<!-- title_ -->
 	<item name="title_order_payment">
@@ -944,7 +961,7 @@
 		<value xml:lang="ko"><![CDATA[추가]]></value>
 		<value xml:lang="en"><![CDATA[Append]]></value>
 		<value xml:lang="jp"><![CDATA[Append]]></value>
-		<value xml:lang="zh-TW"><![CDATA[Append]]></value>		
+		<value xml:lang="zh-TW"><![CDATA[附加]]></value>		
 	</item>
 
 	<!-- msg_ -->
@@ -1048,25 +1065,31 @@
 		<value xml:lang="ko"><![CDATA[상품을 찾을 수 없습니다.]]></value>
 		<value xml:lang="en"><![CDATA[Item not found]]></value>
 		<value xml:lang="jp"><![CDATA[Item not found]]></value>		
-		<value xml:lang="zh-TW"><![CDATA[Item not found]]></value>
+		<value xml:lang="zh-TW"><![CDATA[項目沒有找到]]></value>
 	</item>
 	<item name="msg_omitted_item_found">
 		<value xml:lang="ko"><![CDATA[함께 구매되어야 할 상품이 %u개 있습니다 : %s]]></value>
 		<value xml:lang="en"><![CDATA[Omitted Items Found(%u) : %s]]></value>
 		<value xml:lang="jp"><![CDATA[Omitted Items Found(%u) : %s]]></value>		
-		<value xml:lang="zh-TW"><![CDATA[Omitted Items Found(%u) : %s]]></value>
+		<value xml:lang="zh-TW"><![CDATA[發現省略項目(%u) : %s]]></value>
 	</item>
 	<item name="msg_minimum_order_quantity">
 		<value xml:lang="ko"><![CDATA[관련상품 중 적어도 %u 개 이상 함께 구매하셔야 합니다.]]></value>
 		<value xml:lang="en"><![CDATA[You have to purchase %u of related items at least.]]></value>
 		<value xml:lang="jp"><![CDATA[You have to purchase %u of related items at least.]]></value>		
-		<value xml:lang="zh-TW"><![CDATA[You have to purchase %u of related items at least.]]></value>
+		<value xml:lang="zh-TW"><![CDATA[至少須購買 %u 的相關品項.]]></value>
 	</item>
 	<item name="msg_minimum_order_quantity_elearning">
 		<value xml:lang="ko"><![CDATA[관련교재 중 적어도 %u 개 이상 함께 구매하셔야 합니다.]]></value>
 		<value xml:lang="en"><![CDATA[You have to purchase %u of related books at least.]]></value>
 		<value xml:lang="jp"><![CDATA[You have to purchase %u of related books at least.]]></value>		
-		<value xml:lang="zh-TW"><![CDATA[You have to purchase %u of related books at least.]]></value>
+		<value xml:lang="zh-TW"><![CDATA[至少須購買 %u 的相關品項.]]></value>
+	</item>
+	<item name="msg_added_to_favorite_list">
+		<value xml:lang="ko"><![CDATA[관심상품에 추가하였습니다. 관심상품으로 이동하시겠습니까?]]></value>
+		<value xml:lang="en"><![CDATA[Added to your favorite list. Are you going to go to the favorites?]]></value>
+		<value xml:lang="jp"><![CDATA[Added to your favorite list. Are you going to go to the favorites?]]></value>		
+		<value xml:lang="zh-TW"><![CDATA[要加入有興趣品項嗎? 按[確認]前往有興趣品項頁面]]></value>
 	</item>
 
 	<!-- about_ -->
@@ -1290,7 +1313,7 @@
 	<item name="nstore_related_items">
 		 <value xml:lang="ko"><![CDATA[관련상품]]></value>
 		 <value xml:lang="en"><![CDATA[Related items]]></value>
-		 <value xml:lang="zh-TW"><![CDATA[Related items]]></value>              
+		 <value xml:lang="zh-TW"><![CDATA[相關項目]]></value>              
 	</item>
 	<item name="member_id">
 		 <value xml:lang="ko"><![CDATA[회원ID]]></value>
@@ -1350,10 +1373,12 @@
 	<item name="about_related_items">
 		<value xml:lang="ko"><![CDATA[관련상품으로 노출되며 필수주문 상품으로 설정하면 반드시 함께 주문하도록 강제합니다.]]></value>
 		<value xml:lang="en"><![CDATA[Related items you chosen will be shown with this item and you can make them purchasing forced.]]></value>
+		 <value xml:lang="zh-TW"><![CDATA[選擇的相關項目將與這品項一起顯示，這些是必須購買.]]></value> 
 	</item>
 	<item name="about_minimum_order_quantity">
 		<value xml:lang="ko"><![CDATA[관련상품을 함께 구매해야 할 최소수량을 설정 할 수 있습니다. 1로 설정 할 경우 관련상품을 1개 이상 구매해야 합니다.]]></value>
-		<value xml:lang="en"><![CDATA[You can set up the minimum order quantity of the related items. If you set it 1, then purchaser must buy the related items more than 1. ]]></value>
+		<value xml:lang="en"><![CDATA[您可以設置的相關項目的最低訂貨量。如果設置1，則購買者必須購買相關的項目超過1. ]]></value>
+		 <value xml:lang="zh-TW"><![CDATA[內容管理]]></value> 
 	</item>
 	<item name="currency_list" type="array">
 		<item name="KRW">

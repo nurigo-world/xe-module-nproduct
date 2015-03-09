@@ -58,7 +58,7 @@
 	<item name="sample_view">
 		<value xml:lang="ko"><![CDATA[샘플보기]]></value>
 		<value xml:lang="en"><![CDATA[Sample view]]></value>
-		<value xml:lang="zh-TW"><![CDATA[Sample view]]></value>
+		<value xml:lang="zh-TW"><![CDATA[試看]]></value>
 	</item>
 	<item name="course_book">
 		<value xml:lang="ko"><![CDATA[관련교재]]></value>
