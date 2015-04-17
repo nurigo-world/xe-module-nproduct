@@ -17,12 +17,6 @@ class nproductView extends nproduct
 		Context::set('module_info',$this->module_info);
 
 		if(!$this->module_info->proc_module) return;
-
-		$oLicenseModel = &getModel('license');
-		if(!$oLicenseModel || ($oLicenseModel && !$oLicenseModel->getLicenseConfirm($this->module_info->proc_module)))
-		{
-			Context::addHtmlHeader("<script>jQuery(document).ready(function() { jQuery('<div style=\"background:#fff; padding:6px; position:fixed; right:6px; bottom:6px; z-index:999999; \">Powered by <a href=\"http://www.xeshoppingmall.com\">NURIGO</a></div>').appendTo('body'); });</script>");
-		}
 	}
 
 	/**
@@ -30,9 +24,6 @@ class nproductView extends nproduct
 	 */
 	function dispNproductIndex() 
 	{
-		$oLicenseModel = &getModel('license');
-		if(!$oLicenseModel) return new Object(-1, 'license module must be installed.');
-
 		// add translation for javascript
 		Context::addHtmlHeader(sprintf("<script>
 	xe.lang.msg_put_item_in_cart = '%s';
