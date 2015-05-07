@@ -80,9 +80,9 @@
 					<td colspan="4">
 						<div class="t_bottom">
 							<div class="btn_item t_right">
-								<a cond="$logged_info->is_admin == 'Y'" href="#" class="gray_btn" onclick="addItemsToCartInDetailPage({$item_info->item_srl}); return false;"><span>{$lang->cmd_cart}</span></a>
-								<a cond="$logged_info->is_admin == 'Y'" href="#" class="orange_btn" onclick="orderItemsInDetailPage({$item_info->item_srl}, '{$module_info->ncart_mid}'); return false;"><span>{$lang->course_registration}</span></a>
-								<a cond="$logged_info->is_admin == 'Y'" href="#" class="gray_btn" onclick="addItemsToFavorites({$item_info->item_srl});"><span>{$lang->cmd_favorites}</span></a>
+								<a href="#" class="gray_btn" onclick="addItemsToCartInDetailPage({$item_info->item_srl}); return false;"><span>{$lang->cmd_cart}</span></a>
+								<a href="#" class="orange_btn" onclick="orderItemsInDetailPage({$item_info->item_srl}, '{$module_info->ncart_mid}'); return false;"><span>{$lang->course_registration}</span></a>
+								<a href="#" class="gray_btn" onclick="addItemsToFavorites({$item_info->item_srl});"><span>{$lang->cmd_favorites}</span></a>
 								<a href="{getUrl('act','','item_srl','','document_srl','')}" class="gray_btn"><span>{$lang->cmd_view_list}</span></a>
 							</div>
 						</div>
