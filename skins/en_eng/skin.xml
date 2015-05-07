@@ -46,10 +46,12 @@
 				<description xml:lang="ko">썸네일 생성 방법을 선택할 수 있습니다.</description>
 				<description xml:lang="zh-TW">網站的圖片來源可能無法和面版很契合,請選擇縮圖調整方式來建立適合的圖片面版。</description>
 				<options value="crop">
-					<title xml:lang="ko">縮圖大小填滿(裁剪)</title>
+					<title xml:lang="ko">꽉 채우기</title>
+					<title xml:lang="zh-TW">縮圖大小填滿(裁剪)</title>
 				</options>
 				<options value="ratio">
-					<title xml:lang="ko">縮圖比例調整(縮放)</title>
+					<title xml:lang="ko">비율 맞추기</title>
+					<title xml:lang="zh-TW">縮圖比例調整(縮放)</title>
 				</options>
 			</var>
 		</group>
