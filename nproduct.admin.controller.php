@@ -614,7 +614,6 @@ class nproductAdminController extends nproduct
 
 	function insertDetailListConfig()
 	{
-		debugPrint('insertDetailListConfig');
 		$module_srl = Context::get('module_srl');
 		$list = explode(',',Context::get('list'));
 		if(!count($list)) return new Object(-1, 'msg_invalid_request');
@@ -636,7 +635,6 @@ class nproductAdminController extends nproduct
 
 	function insertListConfig()
 	{
-		debugPrint('insertListConfig');
 		$module_srl = Context::get('module_srl');
 		$list = explode(',',Context::get('list'));
 		if(!count($list)) return new Object(-1, 'msg_invalid_request');
@@ -660,7 +658,6 @@ class nproductAdminController extends nproduct
 	 */
 	function procNproductAdminInsertListConfig()
 	{
-		debugPrint('procNproductAdminInsertListConfig');
 		$output = $this->insertListConfig();
 		if(!$output->toBool()) return $output;
 		$this->setMessage('success_registed');
@@ -672,7 +669,6 @@ class nproductAdminController extends nproduct
 	 */
 	function procNproductAdminInsertDetailListConfig()
 	{
-		debugPrint('procNproductAdminInsertDetailListConfig#####');
 		$output = $this->insertDetailListConfig();
 		if(!$output->toBool()) return $output;
 		$this->setMessage('success_registed');
@@ -876,8 +872,6 @@ class nproductAdminController extends nproduct
 		 */
 
 		$output = executeQuery('nproduct.updateItemAdmin', $args);
-		debugPrint('updateItemAdmin');
-		debugPrint($output);
 		if (!$output->toBool()) return $output;
 
 		// update group discount
@@ -1106,7 +1100,6 @@ class nproductAdminController extends nproduct
 	function deleteNproductFile($file_srl, $item_srl)
 	{
 
-		debugPrint('okok-1');
 		$oFileController = &getController('file');
 
 		$oFileController->deleteFile($file_srl);
