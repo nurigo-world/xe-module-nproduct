@@ -100,8 +100,8 @@
 		</div><!-- info-tab -->
 	</div><!-- item_align -->
 	<div class="btn_set">
-		<a cond="$logged_info->is_admin == 'Y'" href="#" class="ngray" onclick="addItemsToCartInDetailPage({$item_info->item_srl}); return false;"><span>{$lang->cmd_cart}</span></a>
-		<a cond="$logged_info->is_admin == 'Y'" href="#" class="norange" onclick="orderItemsInDetailPage({$item_info->item_srl}, '{$module_info->ncart_mid}'); return false;"><span>{$lang->course_registration}</span></a>
+		<a href="#" class="ngray" onclick="addItemsToCartInDetailPage({$item_info->item_srl}); return false;"><span>{$lang->cmd_cart}</span></a>
+		<a href="#" class="norange" onclick="orderItemsInDetailPage({$item_info->item_srl}, '{$module_info->ncart_mid}'); return false;"><span>{$lang->course_registration}</span></a>
 		<a href="#" class="ngray" onclick="addItemsToFavorites({$item_info->item_srl}); return false;"><span>{$lang->cmd_favorites}</span></a>
 	</div>
 
