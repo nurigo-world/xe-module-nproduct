@@ -15,19 +15,20 @@ class nucommon
 		if(!is_array($in_xml_obj)) 
 		{
 			$xml_obj = array($in_xml_obj);
-		} else {
+		}
+		else 
+		{
 			$xml_obj = $in_xml_obj;
 		}
 		$act = Context::get('act');
 
 		$menus = array();
-		foreach ($xml_obj as $it) {
+		foreach ($xml_obj as $it) 
+		{
 			$obj = new StdClass();
 			$obj->id = $it->id->body;
-			if($parent_item) 
-			{
-				$obj->parent_id = $parent_item->id;
-			}
+			if($parent_item) $obj->parent_id = $parent_item->id;
+
 			$obj->title = $it->title->body;
 			$obj->action = array();
 			if(is_array($it->action))
@@ -51,17 +52,13 @@ class nucommon
 					$parent_item->selected = true;
 				}
 			}
+
 			if($it->item && ($it->attrs->modinst != 'true'||Context::get('module_srl'))) 
 			{
 				$obj->submenu = nucommon::getMenu($it->item, $depth+1, $obj);
-				if($obj->selected && $parent_item) 
-				{
-					$parent_item->selected= true;
-				}
-				if($obj->selected) 
-				{
-					Context::set('selected_menu', $obj);
-				}
+				if($obj->selected && $parent_item) $parent_item->selected= true;
+
+				if($obj->selected) Context::set('selected_menu', $obj);
 			}
 			$menus[$obj->id] = $obj;
 			unset($obj);
@@ -134,6 +131,9 @@ class nucommon
 		return FALSE;
 	}
 
+	/**
+	 * @brief get news 
+	 */
 	function getNewsFromAgency()
 	{
 		//Retrieve recent news and set them into context
@@ -160,7 +160,8 @@ class nucommon
 					$item = array($item);
 				}
 
-				foreach($item as $key => $val) {
+				foreach($item as $key => $val) 
+				{
 					$obj = null;
 					$obj->title = $val->body;
 					$obj->date = $val->attrs->date;

@@ -33,12 +33,13 @@ class nproductItem extends Object
 	var $decimals = 0;
 	var $thumb_file_srl = 0;
 
+	/**
+	 * @brief constructor
+	 *
+	 */
 	function nproductItem($info, $currency="KRW", $as_sign="N", $decimals=0) 
 	{
-		if(is_object($info)) 
-		{
-			$this->setAttributes($info);
-		}
+		if(is_object($info)) $this->setAttributes($info);
 		if(is_numeric($info)) 
 		{
 			$oStoreModel = &getModel('nproduct');
@@ -65,23 +66,32 @@ class nproductItem extends Object
 		}
 	}
 	
+	/**
+	 * @brief print price
+	 *
+	 */
 	function printPrice($price = null)
 	{
 		$oCurrencyModel = &getModel('currency');
 
-		if(!$price)
-			$price = $this->price;
-
+		if(!$price) $price = $this->price;
 		return $oCurrencyModel->printPrice($price);
 	}
 
+	/**
+	 * @brief set currency config
+	 *
+	 */
 	function setCurrency($currency = "KRW", $as_sign = "N")
 	{
 		$oCurrencyModel = &getModel('currency');
 		$oCurrencyModel->setCurrency($currency, $as_sign);
-		
 	}
 
+	/**
+	 * @brief get price
+	 *
+	 */
 	function price($price)
 	{
 		$oCurrencyModel = &getModel('currency');
@@ -89,29 +99,42 @@ class nproductItem extends Object
 
 	}
 
+	/**
+	 * @brief print formatted price 
+	 *
+	 */
 	function formatMoney($number)
 	{
 		$oCurrencyModel = &getModel('currency');
 		return $oCurrencyModel->formatMoney($number);
 	}
 
+	/**
+	 * @brief get price
+	 *
+	 */
 	function getPrice($price = null)
 	{
 		$oCurrencyModel = &getModel('currency');
-		if ($price===NULL)
-		{
-			$price = $this->price;
-		}
+		if ($price===NULL) $price = $this->price;
 		
 		return $oCurrencyModel->getPrice($price);
 	}
 
+	/**
+	 * @brief get discounted price
+	 *
+	 */
 	function getDiscountedPrice()
 	{
 		if($this->discounted_price) return $this->discounted_price;
 		return $this->price;
 	}
 
+	/**
+	 * @brief print discounted price
+	 *
+	 */
 	function printDiscountedPrice($price = null)
 	{
 		if($price !== null)
@@ -120,33 +143,53 @@ class nproductItem extends Object
 		return $this->printPrice($this->discounted_price);
 	}
 
+	/**
+	 * @brief set attributes
+	 *
+	 */
 	function setAttributes($info) 
 	{
-		foreach ($info as $key=>$val) {
+		foreach ($info as $key=>$val) 
+		{
 			$this->{$key} = $val;
 		}
 	}
 
+	/**
+	 * @brief get item name
+	 *
+	 */
 	function getItemName($cut_size=0)
 	{
 		return cut_str($this->item_name, $cut_size, '..');
 	}
 
+	/**
+	 * @brief 
+	 *
+	 */
 	function getFileSrl()
 	{
 		$file_srl = $this->thumb_file_srl;
 		return $file_srl;
 	}
 
+	/**
+	 * @brief 
+	 *
+	 */
 	function getExtraVarTitle($key)
 	{
 		if(isset($this->extra_var_objs->{$key}->column_title))
-		{
 			return $this->extra_var_objs->{$key}->column_title;
-		}
+
 		return NULL;
 	}
 
+	/**
+	 * @brief 
+	 *
+	 */
 	function getExtraVarValue($key)
 	{
 		$value = NULL;
@@ -155,21 +198,27 @@ class nproductItem extends Object
 		return $value;
 	}
 
+	/**
+	 * @brief 
+	 *
+	 */
 	function thumbnailExists($width = 80, $height = 0, $type = 'crop') 
 	{
 		if(!$this->getThumbnail($width, $height, $type)) return false;
 		return true;
 	}
 
+	/**
+	 * @brief get thumbnail
+	 *
+	 */
 	function getThumbnail($width = 80, $height = 0, $thumbnail_type = 'crop') 
 	{
 		$oFileModel = &getModel('file');
 
 		$file_srl = $this->getFileSrl();
-
 		if(!$file_srl) return NULL;
 		if(!$height) $height = $width;
-
 
 		// Define thumbnail information
 		$thumbnail_path = sprintf('files/cache/thumbnails/%s',getNumberingPath($file_srl, 3));
@@ -187,15 +236,10 @@ class nproductItem extends Object
 		// Target File
 		$source_file = NULL;
 		$file = $oFileModel->getFile($file_srl);
-		if($file) 
-		{
-			$source_file = $file->uploaded_filename;
-		}
+		if($file) $source_file = $file->uploaded_filename;
 
 		if($source_file)
-		{
 			$output = FileHandler::createImageFile($source_file, $thumbnail_file, $width, $height, 'jpg', $thumbnail_type);
-		}
 		// Return its path if a thumbnail is successfully genetated
 		if($output) return $thumbnail_url;
 		// Create an empty file not to re-generate the thumbnail
@@ -204,6 +248,10 @@ class nproductItem extends Object
 		return NULL;
 	}
 
+	/**
+	 * @brief get document
+	 *
+	 */
 	function getDocument()
 	{
 		$oDocumentModel = &getModel('document');

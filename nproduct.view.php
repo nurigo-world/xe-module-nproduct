@@ -7,6 +7,9 @@
  */
 class nproductView extends nproduct
 {
+	/**
+	 * @brief init
+	 */
 	function init()
 	{
 		// 템플릿 경로 설정
@@ -26,10 +29,10 @@ class nproductView extends nproduct
 	{
 		// add translation for javascript
 		Context::addHtmlHeader(sprintf("<script>
-	xe.lang.msg_put_item_in_cart = '%s';
-</script>", Context::getLang('msg_put_item_in_cart')));
-	
-		if (Context::get('item_srl')||Context::get('document_srl'))
+											xe.lang.msg_put_item_in_cart = '%s';
+										</script>", Context::getLang('msg_put_item_in_cart')));
+		
+		if(Context::get('item_srl') || Context::get('document_srl'))
 		{
             return $this->dispNproductItemDetail();
         }
@@ -39,13 +42,17 @@ class nproductView extends nproduct
 	/**
 	 * @return post node
 	 **/
-	function getPostNode($node_route) {
+	function getPostNode($node_route) 
+	{
 		$route_arr = preg_split('/\./', trim($node_route, '.'));
 		$last = count($route_arr) - 1;
 		if ($last < 0) return;
 		return $route_arr[$last];
 	}
 
+	/**
+	 * @brief get entire category tree
+	 */
 	function getEntireCategoryTree($module_srl)
 	{
 		// category tree
@@ -55,8 +62,10 @@ class nproductView extends nproduct
 		$category_list = $output->data;
 		$category_tree = array();
 		$category_index = array();
-		if ($category_list) {
-			foreach ($category_list as $no => $cate) {
+		if ($category_list) 
+		{
+			foreach ($category_list as $no => $cate) 
+			{
 				$node_route = $cate->node_route.$cate->node_id;
 				$stages = explode('.',$node_route);
 				$code_str = '$category_tree["' . implode('"]["', $stages) . '"] = array();';
@@ -68,24 +77,17 @@ class nproductView extends nproduct
 		Context::set('entire_category_index', $category_index);
 	}
 
+	/**
+	 * @brief get category tree
+	 */
 	function getCategoryTree($module_srl) 
 	{
 		$oNproductModel = &getModel('nproduct');
 		$category = Context::get('category');
 
 		$this->getEntireCategoryTree($module_srl);
-		/*
-		if ($category && $this->module_info->category_display=='2') {
-			$category_info = $oNproductModel->getCategoryInfo($category);
-			$top = preg_split('/\./', $category_info->node_route);
-			if (count($top) >= 2) {
-				$args->node_route = sprintf("%s.%s.", $top[0], $top[1]);
-				Context::set('top_category_srl', $top[1]);
-			}
-			if ($category_info->node_route=='f.') $args->node_route = 'f.' . $category . '.';
-		}
-		 */
-		if ($category) {
+		if ($category) 
+		{
 			$selected_category_info = $oNproductModel->getCategoryInfo($category);
 			if ($selected_category_info->node_route=='f.') $args->node_route = 'f.' . $category . '.';
 			$current_node_route = $selected_category_info->node_route . $category . '.'; // . $category . '.';
@@ -106,6 +108,7 @@ class nproductView extends nproduct
 			Context::set('category_info', $selected_category_info);
 			Context::set('category_depth', 0);
 		}
+
 		$oNproductModel->getSubcategoryCount($current_node_route);
 
 		// has sub-nodes
@@ -150,20 +153,20 @@ class nproductView extends nproduct
 		Context::set('siblings', $category_list);
 	}
 
-
+	/**
+	 * @brief display item list
+	 */
 	function dispNproductItemList() 
 	{
-
 		$oNproductModel = &getModel('nproduct');
 		$oStore_reviewModel = &getModel('store_review');
+		$oNproductModel = &getModel('nproduct');
+		$oFileModel = &getModel('file');
+
 		$config = $oNproductModel->getModuleConfig();
 
 		Context::set('list_config', $oNproductModel->getListConfig($this->module_info->module_srl));
-
 		Context::set('config',$config);
-
-		$oNproductModel = &getModel('nproduct');
-		$oFileModel = &getModel('file');
 
 		// item list
 		$category = Context::get('category');
@@ -177,7 +180,8 @@ class nproductView extends nproduct
 
 		if (!$sort_index) $sort_index = "list_order";
 		if (!$order_type) $order_type = 'asc';
-		if ($category) {
+		if ($category) 
+		{
 			$category_info = $oNproductModel->getCategoryInfo($category);
 			Context::set('category_info', $category_info);
 
@@ -195,7 +199,9 @@ class nproductView extends nproduct
 			Context::set('total_page', $output->total_page);
 			Context::set('page', $output->page);
 			Context::set('page_navigation', $output->page_navigation);
-		} else {
+		} 
+		else 
+		{
 			$args->module_srl = $this->module_info->module_srl;
 			$args->display='Y';
 			$args->node_route = 'f.';
@@ -213,17 +219,6 @@ class nproductView extends nproduct
 		}
 
 		$discounted = $oNproductModel->discountItems($item_list);
-/*
-		if ($item_list) {
-			foreach ($item_list as $key=>$val) {
-				$item_list[$key] = new nproductItem($val, $config->currency, $config->as_sign, $config->decimals);
-				$output = $oNproductModel->discountItem($val);
-				$item_list[$key]->discounted_price = $output->discounted_price;
-				$item_list[$key]->discount_amount = $output->discount_amount;
-				$item_list[$key]->discount_info = $output->discount_info;
-			}
-		}
-*/
 		foreach($item_list as $key => $item)
 		{
 			$review = $oStore_reviewModel->getTotalReviewInfo($item->item_srl);
@@ -237,7 +232,6 @@ class nproductView extends nproduct
 		 */
 
 		$logged_info = Context::get('logged_info');
-
 		if($logged_info)
 		{
 			$oNmileageModel = &getModel('nmileage');
@@ -257,7 +251,6 @@ class nproductView extends nproduct
 		/* 
 		 * end
 		 */
-
 		// category list
 		$this->getCategoryTree($this->module_info->module_srl);
 		require_once('nproduct.category.php');
@@ -266,6 +259,9 @@ class nproductView extends nproduct
 		$this->setTemplateFile('itemlist');
 	}
 
+	/**
+	 * @brief display item detail info
+	 */
 	function dispNproductItemDetail() 
 	{
 		if($_COOKIE['mobile'] == "true") Context::set('is_mobile', 'true');
@@ -298,13 +294,11 @@ class nproductView extends nproduct
 		}
 
 		$output = executeQuery('nproduct.getItemInfo', $args);
-		if (!$output->toBool()) 
-		{
-			return $output;
-		}
+		if (!$output->toBool()) return $output;
 		$item_info = $output->data;
 		// thumbnail
-		if($item_info->thumb_file_srl) {
+		if($item_info->thumb_file_srl) 
+		{
 			$file = $oFileModel->getFile($item_info->thumb_file_srl);
 			if($file) $item_info->thumbnail_url = getFullUrl().$file->download_url;
 		}
@@ -366,9 +360,13 @@ class nproductView extends nproduct
 		$this->setTemplateFile('itemdetail');
 	}
 
-
+	/**
+	 * @brief display replay comment
+	 */
 	function dispNproductReplyComment() 
 	{
+		$oCommentModel = &getModel('comment');
+
 		// 권한 체크
 		if(!$this->grant->write_comment) return new Object(-1,'msg_not_permitted');
 
@@ -379,7 +377,6 @@ class nproductView extends nproduct
 		if(!$parent_srl) return new Object(-1, 'msg_invalid_request');
 
 		// 해당 댓글를 찾아본다
-		$oCommentModel = &getModel('comment');
 		$oSourceComment = $oCommentModel->getComment($parent_srl, $this->grant->manager);
 
 		// 댓글이 없다면 오류
@@ -400,7 +397,6 @@ class nproductView extends nproduct
 		 * 사용되는 javascript 필터 추가
 		 **/
 		//Context::addJsFilter($this->module_path.'tpl/filter', 'insert_comment.xml');
-
 		$this->setTemplateFile('commentform');
 	}
 }

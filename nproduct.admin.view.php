@@ -13,14 +13,16 @@ class nproductAdminView extends nproduct
 	 **/
 	function init() 
 	{
+		$oModuleModel = &getModel('module');
+
 		// module이 cympusadmin일때 관리자 레이아웃으로
         if(Context::get('module')=='cympusadmin')
         {
             $classfile = _XE_PATH_.'modules/cympusadmin/cympusadmin.class.php';
             if(file_exists($classfile))
             {
-                    require_once($classfile);
-                    cympusadmin::init();
+				require_once($classfile);
+				cympusadmin::init();
             }
         }
 
@@ -31,8 +33,6 @@ class nproductAdminView extends nproduct
 			$module_srl = $this->module_srl;
 			Context::set('module_srl', $module_srl);
 		}
-
-		$oModuleModel = &getModel('module');
 
 		// module_srl이 넘어오면 해당 모듈의 정보를 미리 구해 놓음
 		if($module_srl) 
@@ -70,11 +70,17 @@ class nproductAdminView extends nproduct
 		return nucommon::getLicenseFromAgency('nproduct', $config->user_id, $config->serial_number);
 	}
 
+	/**
+	 * @brief 
+	 */
 	function dispNproductAdminCategoryManagement() 
 	{
 		$this->setTemplateFile('categorymanagement');
     }
 
+	/**
+	 * @brief 
+	 */
 	function dispNproductAdminInsertItem() 
 	{
 		$oEditorModel = &getModel('editor');
@@ -130,7 +136,8 @@ class nproductAdminView extends nproduct
 		$category_data->list = array();
 		$count=0;
 		$node_route = '';
-		foreach ($node_route_arr as $node_id) {
+		foreach ($node_route_arr as $node_id) 
+		{
 			if(!$node_id) continue;
 			if(Context::get('module_srl')) 
 			{
@@ -151,12 +158,14 @@ class nproductAdminView extends nproduct
 		if (!is_array($item_info->group_srl_list)) $item_info->group_srl_list = array();
 
 		// 콘텐츠 파일 (앞으로 사용하지 않을 필드)
-		if($item_info->file_srl) {
+		if($item_info->file_srl) 
+		{
 			$file = $oFileModel->getFile($item_info->file_srl);
 			if($file) $item_info->download_file = $file;
 		}
 		// get thumbnail URL
-		if($item_info->thumb_file_srl) {
+		if($item_info->thumb_file_srl) 
+		{
 			$file = $oFileModel->getFile($item_info->thumb_file_srl);
 			if($file) $item_info->thumbnail_url = getFullUrl().$file->download_url;
 		}
@@ -216,6 +225,9 @@ class nproductAdminView extends nproduct
 		Context::set('module_list', $module_list);
 	}
 
+	/**
+	 * @brief 
+	 */
 	function dispNproductAdminItemList() 
 	{
 		$oNproductModel = &getModel('nproduct');
@@ -257,7 +269,6 @@ class nproductAdminView extends nproduct
 				return $output;
 			}
 			$item_list = $output->data;
-
 			Context::set('total_count', $output->total_count);
 			Context::set('total_page', $output->total_page);
 			Context::set('page', $output->page);
@@ -283,18 +294,17 @@ class nproductAdminView extends nproduct
 			Context::set('total_page', $output->total_page);
 			Context::set('page', $output->page);
 			Context::set('page_navigation', $output->page_navigation);
-
 		} 
 
 		if($item_list)
 		{
-			foreach ($item_list as $key=>$val) {
+			foreach ($item_list as $key=>$val) 
+			{
 				$item_list[$key] = new nproductItem($val);
 			}
 		}
 
 		Context::set('list', $item_list);
-
 
 		// front display
 		$display_categories = $oNproductModel->getFrontDisplayItems($this->module_info->module_srl);
@@ -302,7 +312,9 @@ class nproductAdminView extends nproduct
 		$this->setTemplateFile('itemlist');
 	}
 
-
+	/**
+	 * @brief display module instance list
+	 */
 	function dispNproductAdminModInstList() 
 	{
 		$oModuleModel = &getModel('module');
@@ -313,8 +325,10 @@ class nproductAdminView extends nproduct
 		$args->page_count = 10;
 		$args->s_module_category_srl = Context::get('module_category_srl');
 		$output = executeQueryArray('nproduct.getModInstList', $args);
+		if(!$output->toBool()) return $output;
 		$list = $output->data;
 		$list = $oModuleModel->addModuleExtraVars($list);
+
 		Context::set('total_count', $output->total_count);
 		Context::set('total_page', $output->total_page);
 		Context::set('page', $output->page);
@@ -333,6 +347,9 @@ class nproductAdminView extends nproduct
 		Context::set('module_category', $module_category);
 	}
 
+	/**
+	 * @brief display module config info
+	 */
 	function dispNproductAdminConfig() 
 	{
 		$oNproductModel = &getModel('nproduct');
@@ -371,39 +388,41 @@ class nproductAdminView extends nproduct
 		$this->setTemplateFile('config');
 	}
 
+	/**
+	 * @brief display insert module instance page
+	 **/
 	function dispNproductAdminInsertModInst() 
 	{
-		// 스킨 목록을 구해옴
+		$oNcartModel = &getModel('ncart');
 		$oModuleModel = &getModel('module');
+		$oLayoutModel = &getModel('layout');
+		$oEditorModel = &getModel('editor');
+
+		// 스킨 목록을 구해옴
 		$skin_list = $oModuleModel->getSkins($this->module_path);
 		Context::set('skin_list',$skin_list);
-
+		// 모바일 스킨 목록
 		$mskin_list = $oModuleModel->getSkins($this->module_path, "m.skins");
 		Context::set('mskin_list', $mskin_list);
 
 		// 레이아웃 목록을 구해옴
-		$oLayoutModel = &getModel('layout');
 		$layout_list = $oLayoutModel->getLayoutList();
 		Context::set('layout_list', $layout_list);
-
+		// 모바일 레이아웃 목록
 		$mobile_layout_list = $oLayoutModel->getLayoutList(0,"M");
 		Context::set('mlayout_list', $mobile_layout_list);
-
 
 		$module_list = array();
 		$output = ModuleHandler::triggerCall('nproduct.getProcModules', 'before', $module_list);
 		if(!$output->toBool()) return $output;
-
 		Context::set('module_list', $module_list);
 
-		$oNcartModel = &getModel('ncart');
 		if($oNcartModel)
 		{
 			$ncart_insts = $oNcartModel->getModInstList();
 			Context::set('ncart_insts', $ncart_insts);
 		}
 
-		$oEditorModel = &getModel('editor');
 		$config = $oEditorModel->getEditorConfig(0);
 		// 에디터 옵션 변수를 미리 설정
 		$option->skin = $config->editor_skin;
@@ -426,6 +445,9 @@ class nproductAdminView extends nproduct
 		Context::set('module_category', $module_category);
 	}
 
+	/**
+	 * @brief display addition setup page
+	 **/
 	function dispNproductAdminAdditionSetup() 
 	{
 		// content는 다른 모듈에서 call by reference로 받아오기에 미리 변수 선언만 해 놓음
@@ -441,33 +463,32 @@ class nproductAdminView extends nproduct
 		Context::set('setup_content', $content);
 	}
 
+	/**
+	 * @brief display category list page
+	 **/
 	function dispNproductAdminDisplayCategories() 
 	{
 		$args->module_srl = Context::get('module_srl');
 		$output = executeQueryArray('nproduct.getDisplayCategoryList', $args);
-		if(!$output->toBool()) 
-		{
-			return $output;
-		}
+		if(!$output->toBool()) return $output;
 		Context::set('list', $output->data);
 	}
 
+	/**
+	 * @brief display extra item setup page
+	 **/
 	function dispNproductAdminItemExtraSetup() 
 	{
 		$args->module_srl = Context::get('module_srl');
 		$output = executeQueryArray('nproduct.getItemExtraList', $args);
-		if(!$output->toBool()) 
-		{
-			return $output;
-		}
-
+		if(!$output->toBool()) return $output;
 		$ExtraList = $output->data;
 		$oModel = &getModel($this->module_info->proc_module);
 
-		foreach($ExtraList as $k => $v)
+		foreach($ExtraList as $key => $val)
 		{
-			$check_name = $oModel->checkNproductExtraName($v->column_name);
-			if($check_name == true) $v->index_extra = "true";
+			$check_name = $oModel->checkNproductExtraName($val->column_name);
+			if($check_name == true) $val->index_extra = "true";
 		}
 
 		Context::set('list', $ExtraList);
@@ -497,6 +518,9 @@ class nproductAdminView extends nproduct
 		$this->setTemplateFile('skininfo');
 	}
 
+	/**
+	 * @brief display bulk item page
+	 **/
 	function dispNproductAdminBulkItems() 
 	{
 		$oNproductModel = &getModel('nproduct');
@@ -506,7 +530,8 @@ class nproductAdminView extends nproduct
 		Context::set('item_list','');
 		$update_list = array();
 		$original_list = array();
-		foreach ($lines as $line) {
+		foreach ($lines as $line) 
+		{
 			$line = trim($line);
 			$columns = explode("\t", $line);
 			if(count($columns) != 5)
@@ -529,6 +554,9 @@ class nproductAdminView extends nproduct
 		Context::set('update_list', $update_list);
 	}
 
+	/**
+	 * @brief display list setup page
+	 **/
 	function dispNproductAdminListSetup()
 	{
 		$oNproductModel = &getModel('nproduct');
@@ -539,20 +567,20 @@ class nproductAdminView extends nproduct
 		$args->module = 'nproduct';
 		$output = executeQuery('module.getModulePartConfig', $args);
 		if(!$output->data->config)
-		{
 			$oModuleController->insertModulePartConfig('nproduct',$this->module_info->module_srl, $config);
-		}
 
 		if($oNproductModel->getListConfig($this->module_info->module_srl))
-		{
 			Context::set('list_config', $oNproductModel->getListConfig($this->module_info->module_srl));
-		}
+
 		Context::set('extra_vars', $oNproductModel->getDefaultListConfig($this->module_info->module_srl));
 
 		$security = new Security();
 		$security->encodeHTML('list_config');
 	}
 
+	/**
+	 * @brief display detail list setup page
+	 **/
 	function dispNproductAdminDetailListSetup()
 	{
 		$oNproductModel = &getModel('nproduct');
@@ -563,14 +591,11 @@ class nproductAdminView extends nproduct
 		$args->module = 'nproduct.detail';
 		$output = executeQuery('module.getModulePartConfig', $args);
 		if(!$output->data->config)
-		{
 			$oModuleController->insertModulePartConfig('nproduct.detail',$this->module_info->module_srl, $config);
-		}
 
 		if($oNproductModel->getDetailListConfig($this->module_info->module_srl))
-		{
 			Context::set('list_config', $oNproductModel->getDetailListConfig($this->module_info->module_srl));
-		}
+
 		Context::set('extra_vars', $oNproductModel->getDefaultListConfig($this->module_info->module_srl));
 
 		$security = new Security();
@@ -579,6 +604,9 @@ class nproductAdminView extends nproduct
 		$this->setTemplateFile('detaillistsetup');
 	}
 
+	/**
+	 * @brief display group discount page
+	 **/
 	function dispNproductAdminGroupDiscount()
 	{
 		// get groups
@@ -594,7 +622,8 @@ class nproductAdminView extends nproduct
 		$group_discount = array();
 		if($output_data) 
 		{
-			foreach ($output_data as $key=>$val) {
+			foreach ($output_data as $key=>$val) 
+			{
 				$group_discount[$val->group_srl] = $val;
 			}
 		}
@@ -615,6 +644,9 @@ class nproductAdminView extends nproduct
 		$this->setTemplateFile('grantinfo');
 	}
 
+	/**
+	 * @brief display item list to download excel
+	 **/
 	function dispNproductAdminItemListExcelDownload() {
 		$oNproductModel = &getModel('nproduct');
 		$oNproductView = &getView('nproduct');
@@ -626,18 +658,10 @@ class nproductAdminView extends nproduct
 		$sort_index = Context::get('sort_index');
 		$order_type = Context::get('order_type');
 
-		if(!$list_count) 
-		{
-			$list_count = 30;
-		}
-		if(!$sort_index) 
-		{
-			$sort_index = "item_srl";
-		}
-		if(!$order_type) 
-		{
-			$order_type = 'asc';
-		}
+		if(!$list_count) $list_count = 30;
+		if(!$sort_index) $sort_index = "item_srl";
+		if(!$order_type) $order_type = 'asc';
+
 		if($category) 
 		{
 			$category_info = $oNproductModel->getCategoryInfo($category);
@@ -649,10 +673,8 @@ class nproductAdminView extends nproduct
 			$args->sort_index = $sort_index;
 			$args->order_type = $order_type;
 			$output = executeQueryArray('nproduct.getItemsByNodeRoute', $args);
-			if(!$output->toBool()) 
-			{
-				return $output;
-			}
+			if(!$output->toBool()) return $output;
+
 			$item_list = $output->data;
 			Context::set('total_count', $output->total_count);
 			Context::set('total_page', $output->total_page);
@@ -667,10 +689,8 @@ class nproductAdminView extends nproduct
 			$args->sort_index = $sort_index;
 			$args->order_type = $order_type;
 			$output = executeQueryArray('nproduct.getItemsByNodeRoute', $args);
-			if(!$output->toBool()) 
-			{
-				return $output;
-			}
+			if(!$output->toBool()) return $output;
+
 			$item_list = $output->data;
 			Context::set('total_count', $output->total_count);
 			Context::set('total_page', $output->total_page);
@@ -680,7 +700,8 @@ class nproductAdminView extends nproduct
 
 		if($item_list) 
 		{
-			foreach ($item_list as $key=>$val) {
+			foreach ($item_list as $key=>$val) 
+			{
 				$item_list[$key] = new nproductItem($val);
 			}
 		}
@@ -693,15 +714,11 @@ class nproductAdminView extends nproduct
 		header("Content-Disposition: attachment; filename=\"ITEMLIST-" . date('Ymd') . ".xls\"");
 	}
 
+	/**
+	 * @brief display member discount page
+	 **/
 	function dispNproductAdminMemberDiscount()
 	{
-		/*
-		$output = executeQueryArray('nproduct.getMemberDiscount', $args);
-		if(!$output->toBool()) return $output;
-
-		if($output->data) Context::set('discount_list', $output->data);
-		 */
-
 		$oMemberModel = &getModel('member');
 
 		$args->page = Context::get('page');
@@ -718,11 +735,11 @@ class nproductAdminView extends nproduct
 		{
 			$member_discount_list = $output->data;
 
-			foreach($member_discount_list as $k => $v)
+			foreach($member_discount_list as $key => $val)
 			{
-				$member_info = $oMemberModel->getMemberInfoByMemberSrl($v->member_srl);
-				$v->user_id = $member_info->user_id;
-				$v->regdate = substr($v->regdate, 0, 8);
+				$member_info = $oMemberModel->getMemberInfoByMemberSrl($val->member_srl);
+				$val->user_id = $member_info->user_id;
+				$val->regdate = substr($val->regdate, 0, 8);
 			}
 
 			Context::set('member_discount_list', $member_discount_list);
@@ -731,19 +748,14 @@ class nproductAdminView extends nproduct
 		$this->setTemplateFile('memberdiscount');
 	}
 
+	/**
+	 * @brief display quantity discount page
+	 **/
 	function dispNproductAdminQuantityDiscount()
 	{
-		/*
-		$output = executeQueryArray('nproduct.getQuantityDiscount', $args);
-		if(!$output->toBool()) return $output;
-
-		if($output->data) Context::set('discount_list', $output->data);
-		 */
-
 		$oNproductModel = &getModel('nproduct');
 
 		$args->page = Context::get('page');
-
 		$output = executeQueryArray('nproduct.getQuantityDiscount', $args);
 		if(!$output->toBool()) return $output;
 
@@ -756,13 +768,12 @@ class nproductAdminView extends nproduct
 		{
 			$quantity_discount_list = $output->data;
 			
-			foreach($quantity_discount_list as $k => $v)
+			foreach($quantity_discount_list as $key => $val)
 			{
-				$item_info = $oNproductModel->getItemInfo($v->item_srl);
-				$v->item_name = $item_info->item_name;
-				$v->regdate = substr($v->regdate, 0, 8);
+				$item_info = $oNproductModel->getItemInfo($val->item_srl);
+				$val->item_name = $item_info->item_name;
+				$val->regdate = substr($val->regdate, 0, 8);
 			}
-
 			Context::set('quantity_discount_list', $quantity_discount_list);
 		}
 

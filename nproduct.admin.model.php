@@ -7,6 +7,10 @@
  */ 
 class nproductAdminModel extends nproduct
 {
+	/**
+	 * @brief get insert extra item form
+	 *
+	 */
 	function getNproductAdminInsertItemExtra() 
 	{
 		$extra_srl = Context::get('extra_srl');
@@ -32,6 +36,10 @@ class nproductAdminModel extends nproduct
 		$this->add('tpl', str_replace("\n"," ",$tpl));
 	}
 
+	/**
+	 * @brief get insert delivery info form
+	 *
+	 */
 	function getNproductAdminInsertDeliveryInfo() 
 	{
 		$item_srl = Context::get('item_srl');
@@ -70,25 +78,28 @@ class nproductAdminModel extends nproduct
 		$editor = $oEditorModel->getEditor(0, $option);
 		Context::set('editor', $editor);
 
-
 		$oTemplate = &TemplateHandler::getInstance();
 		$tpl = $oTemplate->compile($this->module_path.'tpl', 'form_insert_delivery_info');
 
 		$this->add('tpl', str_replace("\n"," ",$tpl));
 	}
 
-
+	/**
+	 * @brief get display category info
+	 *
+	 */
 	function getNproductAdminDisplayCategory() {
 		$args->category_srl = Context::get('category_srl');
 		$output = executeQuery('nproduct.getDisplayCategoryInfo', $args);
-		if(!$output->toBool())
-		{
-			return $output;
-		}
+		if(!$output->toBool()) return $output;
 
 		$this->add('data', $output->data);
 	}
 
+	/**
+	 * @brief get delete module instance form
+	 *
+	 */
 	function getNproductAdminDeleteModInst() {
 		$oModuleModel = &getModel('module');
 
@@ -101,6 +112,10 @@ class nproductAdminModel extends nproduct
 		$this->add('tpl', str_replace("\n"," ",$tpl));
 	}
 
+	/**
+	 * @brief get mileage plus form
+	 *
+	 */
 	function getNproductAdminPlusMileage() {
 		$oModuleModel = &getModel('module');
 
@@ -113,6 +128,10 @@ class nproductAdminModel extends nproduct
 		$this->add('tpl', str_replace("\n"," ",$tpl));
 	}
 
+	/**
+	 * @brief get item delete form
+	 *
+	 */
 	function getNproductAdminDeleteItem() 
 	{
 		$oNstore_coreModel = &getModel('nproduct');
@@ -125,22 +144,27 @@ class nproductAdminModel extends nproduct
 		$this->add('tpl', str_replace("\n"," ",$tpl));
 	}
 
+	/**
+	 * @brief get insert option form
+	 *
+	 */
 	function getNproductAdminInsertOptions() 
 	{
 		$oNstore_coreModel = &getModel('nproduct');
 
 		$item_srl = Context::get('item_srl');
-
 		$options = $oNstore_coreModel->getOptions($item_srl);
-
 		Context::set('options', $options);
 
 		$oTemplate = &TemplateHandler::getInstance();
 		$tpl = $oTemplate->compile($this->module_path.'tpl', 'form_insert_options');
-
 		$this->add('tpl', str_replace("\n"," ",$tpl));
 	}
 
+	/**
+	 * @brief get all categories
+	 *
+	 */
 	function getNproductAdminAllCategories() 
 	{
 		$args->module_srl = Context::get('module_srl');
