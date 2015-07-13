@@ -98,46 +98,42 @@ class nproduct extends ModuleObject
 		$args->module = 'nproduct';
 		$args->site_srl = '0';
 		$output = $oModuleAdminModel->getModuleMidList($args); // module_list get
+		if(!$output->data) return;
 
-		if($output->data)
+		foreach($output->data as $k => $v)
 		{
-			foreach($output->data as $k => $v)
+			// proc_module get
+			$extra_output = $oModuleModel->getModuleExtraVars($v->module_srl);
+			$proc_module = $extra_output[$v->module_srl]->proc_module;
+
+			// default extra_vars
+			$default_extra_forms = $oNproductModel->getNproductExtraVars($proc_module);
+			if($default_extra_forms)
 			{
-				// proc_module get
-				$extra_output = $oModuleModel->getModuleExtraVars($v->module_srl);
-				$proc_module = $extra_output[$v->module_srl]->proc_module;
-
-
-				// default extra_vars
-				$default_extra_forms = $oNproductModel->getNproductExtraVars($proc_module);
-
-				if($default_extra_forms)
+				// current extra_vars
+				$item_extra_output = $oNproductModel->getItemExtraByModuleSrl($v->module_srl);
+				if($item_extra_output)
 				{
-					// current extra_vars
-					$item_extra_output = $oNproductModel->getItemExtraByModuleSrl($v->module_srl);
-					if($item_extra_output)
+					$item_extra = array();
+					foreach($item_extra_output as $key => $val)
 					{
-						$item_extra = array();
-						foreach($item_extra_output as $key => $val)
-						{
-							$item_extra[] = $val->column_name;
-						}
+						$item_extra[] = $val->column_name;
 					}
+				}
 
-					if(!$item_extra_output)
+				if(!$item_extra_output)
+				{
+					if($condition == 'install') $this->updateExtraVars($v->module_srl);
+					else return 'true';
+				}
+				else
+				{
+					foreach($default_extra_forms as $key => $val)
 					{
-						if($condition == 'install') $this->updateExtraVars($v->module_srl);
-						else return 'true';
-					}
-					else
-					{
-						foreach($default_extra_forms as $key => $val)
+						if(!in_array($val->column_name, $item_extra))
 						{
-							if(!in_array($val->column_name, $item_extra))
-							{
-								if($condition == 'install') $this->updateExtraVars($v->module_srl, $val->column_name);
-								else return 'true';
-							}
+							if($condition == 'install') $this->updateExtraVars($v->module_srl, $val->column_name);
+							else return 'true';
 						}
 					}
 				}
@@ -150,37 +146,36 @@ class nproduct extends ModuleObject
 		$oModuleModel =  &getModel('module');
 		$oNproductModel =  &getModel('nproduct');
 		$oNprocutAdminController = &getAdminController('nproduct');
+
 		$module_info = $oModuleModel->getModuleInfoByModuleSrl($module_srl);
 		if(!$module_info) return;
 
 		$default_extra_forms = $oNproductModel->getNproductExtraVars($module_info->proc_module);
+		if(!$default_extra_forms) return;
 
-		if($default_extra_forms)
+		foreach($default_extra_forms as $key=>$val)
 		{
-			foreach($default_extra_forms as $key=>$val)
-			{
-				$extra->module_srl = $module_srl;
-				$extra->column_type = $val->column_type;
-				$extra->column_name = $val->column_name;
-				$extra->column_title = $val->column_title;
-				$extra->default_value = explode("\n", str_replace("\r", '',$val->default_value));
-				$extra->required = $val->required;
-				$extra->is_active = (isset($extra->required));
-				$extra->description = $val->description;
+			$extra->module_srl = $module_srl;
+			$extra->column_type = $val->column_type;
+			$extra->column_name = $val->column_name;
+			$extra->column_title = $val->column_title;
+			$extra->default_value = explode("\n", str_replace("\r", '',$val->default_value));
+			$extra->required = $val->required;
+			$extra->is_active = (isset($extra->required));
+			$extra->description = $val->description;
 
-				if($condition)
-				{
-					if($condition == $val->column_name)
-					{
-						$output = $oNprocutAdminController->insertItemExtra($extra);
-						unset($extra);
-					}
-				}
-				else
+			if($condition)
+			{
+				if($condition == $val->column_name)
 				{
 					$output = $oNprocutAdminController->insertItemExtra($extra);
 					unset($extra);
 				}
+			}
+			else
+			{
+				$output = $oNprocutAdminController->insertItemExtra($extra);
+				unset($extra);
 			}
 		}
 	}
@@ -214,7 +209,6 @@ class nproduct extends ModuleObject
 
 	function moduleUninstall()
 	{
-		$oModuleController = &getController('module');
 	}
 
 	/**

@@ -7,12 +7,20 @@
  */
 class nproductModel extends nproduct
 {
+	/**
+	 * @brief init
+	 *
+	 */
 	function init() 
 	{
 		if (!$this->module_info->thumbnail_width) $this->module_info->thumbnail_width = 150;
 		if (!$this->module_info->thumbnail_height) $this->module_info->thumbnail_height = 150;
 	}
 
+	/**
+	 * @brief get module config
+	 *
+	 */
 	function getModuleConfig()
 	{
 		$oModuleModel = &getModel('module');
@@ -27,15 +35,21 @@ class nproductModel extends nproduct
 
 		$oCurrencyModel = &getModel('currency');
 		$currency = $oCurrencyModel->getModuleConfig();
+		$config->currency = $currency->currency;
 		if (!$currency->currency) $config->currency = 'KRW';
-		else	$config->currency = $currency->currency;
+
+		$config->as_sign = $currency->as_sign;
 		if (!$currency->as_sign) $config->as_sign = 'Y';
-		else	$config->as_sign = $currency->as_sign;
+
+		$config->decimals = $currency->decimals;
 		if (!$currency->decimals) $config->decimals = 0;
-		else	$config->decimals = $currency->decimals;
 		return $config;
 	}
 
+	/**
+	 * @brief get extra item form list
+	 *
+	 */
 	function getItemExtraFormList($module_srl, $filter_response = false) 
 	{
 		global $lang;
@@ -43,11 +57,13 @@ class nproductModel extends nproduct
 		$logged_info = Context::get('logged_info');
 
 		$this->join_form_list = null;
-		if(!$this->join_form_list) {
+		if(!$this->join_form_list) 
+		{
 			// Argument setting to sort list_order column
 			$args->sort_index = "list_order";
 			$args->module_srl = $module_srl;
 			$output = executeQueryArray('nproduct.getItemExtraList', $args);
+			if(!$output->toBool()) return $output;
 
 			// NULL if output data deosn't exist
 			$join_form_list = $output->data;
@@ -57,7 +73,8 @@ class nproductModel extends nproduct
 			if(!is_array($join_form_list)) $join_form_list = array($join_form_list);
 			$join_form_count = count($join_form_list);
 
-			for($i=0;$i<$join_form_count;$i++) {
+			for($i=0;$i<$join_form_count;$i++) 
+			{
 				$join_form_list[$i]->column_name = strtolower($join_form_list[$i]->column_name);
 
 				$extra_srl = $join_form_list[$i]->extra_srl;
@@ -86,16 +103,17 @@ class nproductModel extends nproduct
 		}
 
 		// Get object style if the filter_response is true
-		if($filter_response && count($this->join_form_list)) {
-
-			foreach($this->join_form_list as $key => $val) {
+		if($filter_response && count($this->join_form_list)) 
+		{
+			foreach($this->join_form_list as $key => $val) 
+			{
 				if($val->is_active != 'Y') continue;
 				unset($obj);
 				$obj->type = $val->column_type;
 				$obj->name = $val->column_name;
 				$obj->lang = $val->column_title;
+				$obj->required = false;
 				if($logged_info->is_admin != 'Y') $obj->required = $val->required=='Y'?true:false;
-				else $obj->required = false;
 				$filter_output[] = $obj;
 
 				unset($open_obj);
@@ -111,29 +129,20 @@ class nproductModel extends nproduct
 		return $this->join_form_list;
 	}
 
+	/**
+	 * @brief get default list config
+	 *
+	 */
 	function getDefaultListConfig($module_srl) 
 	{
 		$extra_vars = array();
 
 		// 체크박스, 이미지, 상품명, 수량, 금액, 주문 추가
 		$virtual_vars = array('checkbox', 'image', 'title', 'quantity', 'amount', 'cart_buttons', 'sales_count', 'download_count');
-		foreach($virtual_vars as $key) {
+		foreach($virtual_vars as $key) 
+		{
 			$extra_vars[$key] = new ExtraItem($module_srl, -1, Context::getLang($key), $key, 'N', 'N', 'N', null);
 		}
-
-		/*dead
-		$oModuleModel = &getModel('module');
-		$module_info = $oModuleModel->getModuleInfoByModuleSrl($module_srl);
-
-		$output = $this->getNproductExtraVars($module_info->proc_module);
-
-		$idx = 1;
-		foreach ($output as $key => $val)
-		{
-			$extra_vars[$val->column_name] = new ExtraItem($module_srl, $idx, $val->column_title, $val->column_name, 'N', 'N', 'N', null);
-			$idx++;
-		}
-		 */
 
 		// 확장변수 정리
 		$form_list = $this->getItemExtraFormList($module_srl);
@@ -151,6 +160,10 @@ class nproductModel extends nproduct
 
 	}
 
+	/**
+	 * @brief get list config
+	 *
+	 */
 	function getListConfig($module_srl) 
 	{
 		$oModuleModel = &getModel('module');
@@ -192,6 +205,10 @@ class nproductModel extends nproduct
 		return $ret_arr;
 	}
 
+	/**
+	 * @brief get detail list config
+	 *
+	 */
 	function getDetailListConfig($module_srl) 
 	{
 		$oModuleModel = &getModel('module');
@@ -253,7 +270,8 @@ class nproductModel extends nproduct
 		if(!$extend_form_list) return;
 
 		// 값 취합
-		foreach($extend_form_list as $srl => $item) {
+		foreach($extend_form_list as $srl => $item) 
+		{
 			$column_name = $item->column_name;
 			$value = $extra_vars->{$column_name};
 
@@ -266,6 +284,10 @@ class nproductModel extends nproduct
 		return $extend_form_list;
 	}
 
+	/**
+	 * @brief get category info
+	 *
+	 */
 	function getCategoryInfo($node_id) 
 	{
 		$args->node_id = $node_id;
@@ -294,6 +316,10 @@ class nproductModel extends nproduct
 		return $output->data;
 	}
 
+	/**
+	 * @brief get all categories
+	 *
+	 */
 	function getAllCategories() 
 	{
 		$output = executeQuery('nproduct.getAllCategories');
@@ -301,6 +327,10 @@ class nproductModel extends nproduct
 		return $output->data;
 	}
 
+	/**
+	 * @brief get item info
+	 *
+	 */
 	function getItemInfo($item_srl) 
 	{
 		$config = $this->getModuleConfig();
@@ -372,6 +402,7 @@ class nproductModel extends nproduct
 		$args->sort_index = $sort_index;
 		$output = executeQueryArray('nproduct.getItemList', $args);
 		if (!$output->toBool()) return;
+
 		$list = array();
 		foreach($output->data as $no=>$val)
 		{
@@ -497,6 +528,7 @@ class nproductModel extends nproduct
 		$output = executeQueryArray('nproduct.getItemList', $args);
 		if (!$output->toBool()) return;
 		$list = $output->data;
+		
 		$retobj = $this->discountItems($list);
 		return $list;
 	}
@@ -538,6 +570,9 @@ class nproductModel extends nproduct
 		return $item;
 	}
 
+	/**
+	 * @brief 
+	 */
 	function getNproductItemInfos() 
 	{
 		$oMemberModel = &getModel('member');
@@ -545,10 +580,7 @@ class nproductModel extends nproduct
 		$document_srls = Context::get('document_srls');
 		$logged_info = Context::get('logged_info');
 
-		if(!$document_srls)
-		{
-			return new Object(-1,'no srls');
-		}
+		if(!$document_srls) return new Object(-1,'no srls');
 
 		if(Context::get('image_width') && Context::get('image_height'))
 		{
@@ -581,12 +613,13 @@ class nproductModel extends nproduct
 			$items = $this->discountItems($items, $group_list, $image_width, $image_height);
 			$this->add('data', $items);
 			$this->add('module', 'nproduct');
-
 		}
-		
 		return $items;
 	}
 
+	/**
+	 * @brief get sub category count
+	 */
 	function getSubcategoryCount($node_route)
 	{
 		$args->node_route = $node_route;
@@ -596,6 +629,9 @@ class nproductModel extends nproduct
 		return 0;
 	}
 
+	/**
+	 * @brief get extra vars
+	 */
 	function getExtraVars($module_srl)
 	{
 		$args->module_srl = $module_srl;
@@ -607,21 +643,16 @@ class nproductModel extends nproduct
 		{
 			foreach ($extra_list as $key=>$val)
 			{
-				debugPrint('getExtraVars');
-				debugPrint($val);
-				/*
-				$extra_args->{$val->column_name} = Context::get($val->column_name);
-				 */
 				$value = Context::get($val->column_name);
-				debugPrint('value : ' . $value);
-				if(is_array($value)) { debugPrint($value); debugPrint('is_array : ' . implode(',',$value)); }
 				$extra_args->{$val->column_name} = new NExtraItem($val->module_srl, $key+1, $val->column_name, $val->column_title, $val->column_type, $val->default_value, $val->description, $val->required, 'N', $value);
-				debugPrint($extra_args);
 			}
 		}
 		return $extra_args;
 	}
 
+	/**
+	 * @brief get discount
+	 */
 	function getDiscount(&$item_info)
 	{
 		$output = new Object();
@@ -632,6 +663,9 @@ class nproductModel extends nproduct
 		return $output;
 	}
 
+	/**
+	 * @brief get group discount
+	 */
 	function getGroupDiscount(&$item_info, $group_list) 
 	{
 		$args->item_srl = $item_info->item_srl;
@@ -642,13 +676,17 @@ class nproductModel extends nproduct
 		if (!is_array($group_discount)) $group_discount = array();
 		$discounted_price = 0;
 		$discount_info = "";
-		foreach ($group_discount as $key => $val) {
-			if (array_key_exists($val->group_srl, $group_list)) {
+		foreach ($group_discount as $key => $val) 
+		{
+			if (array_key_exists($val->group_srl, $group_list)) 
+			{
 				$discount_info = $group_list[$val->group_srl];
-				if ($val->opt=='2') {
+				if ($val->opt=='2') 
+				{
 					$discounted_price = $item_info->price * ((100 - $val->price) / 100);
 					$discount_info .= ' ' . $val->price . '% 할인';
-				} else {
+				} else 
+				{
 					$discounted_price = $item_info->price - ($val->price);
 					$discount_info .= ' 할인';
 				}
@@ -664,6 +702,9 @@ class nproductModel extends nproduct
 		return $output;
 	}
 
+	/**
+	 * @brief get global group discount
+	 */
 	function getGlobalGroupDiscount($module_srl, &$item_info, $group_list) 
 	{
 		$args->module_srl = $module_srl;
@@ -675,12 +716,16 @@ class nproductModel extends nproduct
 		$discounted_price = 0;
 		$discount_info = "";
 		foreach ($group_discount as $key => $val) {
-			if (array_key_exists($val->group_srl, $group_list)) {
+			if (array_key_exists($val->group_srl, $group_list)) 
+			{
 				$discount_info = $group_list[$val->group_srl];
-				if ($val->opt=='2') {
+				if ($val->opt=='2') 
+				{
 					$discounted_price = $item_info->price * ((100 - $val->price) / 100);
 					$discount_info .= ' ' . $val->price . '% 할인';
-				} else {
+				} 
+				else 
+				{
 					$discounted_price = $item_info->price - ($val->price);
 					$discount_info .= ' 할인';
 				}
@@ -696,8 +741,9 @@ class nproductModel extends nproduct
 		return $output;
 	}
 
-
-
+	/**
+	 * @brief get quantity discount
+	 */
 	function getQuantityDiscount(&$item_info, $logged_info)
 	{
 		if(!$logged_info) return new Object();
@@ -720,7 +766,6 @@ class nproductModel extends nproduct
 		$quantity_opt = $quantity_discount_data->opt;
 		$quantity_discount = $quantity_discount_data->discount;
 	
-		
 		if($purchase_count < $quantity) return new Object();
 
 		// 구매수량이 정해준 수량을 넘으면 
@@ -742,6 +787,9 @@ class nproductModel extends nproduct
 		return $output;
 	}
 
+	/**
+	 * @brief get member discount
+	 */
 	function getMemberDiscount(&$item_info, $logged_info)
 	{
 		if(!$logged_info) return new Object();
@@ -750,9 +798,7 @@ class nproductModel extends nproduct
 
 		// check 
 		$output = executeQuery('nproduct.getMemberDiscountInfo', $args);
-
 		if(!$output->toBool()) return $output;
-
 		if(!$output->data) return new Object();
 
 		$member_discount_data = $output->data;
@@ -779,7 +825,9 @@ class nproductModel extends nproduct
 		return $output;
 	}
 
-
+	/**
+	 * @brief get discount item
+	 */
 	function discountItem(&$item, $group_list=null)
 	{
 		if(!$group_list)
@@ -799,7 +847,6 @@ class nproductModel extends nproduct
 		// 회원별 할인
 		$output = $this->getMemberDiscount($item, $logged_info);
 		if(!$output->toBool()) return $output;
-
 		if (!$output->discount_amount)
 		{
 			// 구매수량별 할인
@@ -830,6 +877,9 @@ class nproductModel extends nproduct
 		return $output;
 	}
 
+	/**
+	 * @brief discount items
+	 */
 	function discountItems(&$item_list, $group_list=array(), $width=50, $height=50)
 	{
 		$oNcartModel = &getModel('ncart');
@@ -850,7 +900,8 @@ class nproductModel extends nproduct
 		if(!$group_list) $group_list = array();
 		$proc_modules = array();
 
-		foreach ($item_list as $key=>$val) {
+		foreach ($item_list as $key=>$val) 
+		{
 			if(!in_array($val->module, $proc_modules)) $proc_modules[] = $val->module;
 			$item = new nproductItem($val, $config->currency, $config->as_sign, $config->decimals);
 			$item->thumbnail_url = $item->getThumbnail($width, $height);
@@ -902,8 +953,7 @@ class nproductModel extends nproduct
             $output = $this->getItemExtraVarValue($val->item_srl, 'item_delivery_free');
             if($output) $free_delivery = 'Y';
 		}
-		debugPrint('$proc_modules');
-		debugPrint($proc_modules);
+
 		if(in_array('nstore', $proc_modules))
 		{
 			if(!$config->freedeliv_amount || ($ret_obj->total_discounted_price < $config->freedeliv_amount)) $ret_obj->delivery_fee = $config->delivery_fee;
@@ -915,7 +965,6 @@ class nproductModel extends nproduct
 		$ret_obj->total_price = $ret_obj->total_discounted_price + $ret_obj->delivery_fee;
 		$ret_obj->supply_amount = round($ret_obj->taxation_amount / 1.1);
 		$ret_obj->vat = $ret_obj->taxation_amount - $ret_obj->supply_amount;
-
 		$ret_obj->item_list = $item_list;
 
 		return $ret_obj;
@@ -935,6 +984,7 @@ class nproductModel extends nproduct
 		$args->module_srl = $module_srl;
 		if ($category_srl) $args->category_srl = $category_srl;
 		$output = executeQueryArray('nproduct.getDisplayCategoryList', $args);
+		if(!$output->toBool()) return $output;
 		$display_categories = $output->data;
 		if ($display_categories) 
 		{
@@ -943,15 +993,10 @@ class nproductModel extends nproduct
 				$args->category_srl = $val->category_srl;
 				$args->list_count = $num_columns;
 				$output = executeQueryArray('nproduct.getDisplayItems', $args);
-				if (!$output->toBool())
-				{
-					return $output;
-				}
+				if (!$output->toBool()) return $output;
 				$val->items = $output->data;
 				if ($val->items) 
-				{
 					$retobj = $this->discountItems($val->items);
-				}
 
 				$display_categories[$key] = $val;
 			}
@@ -959,17 +1004,24 @@ class nproductModel extends nproduct
 		return $display_categories;
 	}
 
+	/**
+	 * @brief get node length
+	 */
 	function getNodeRouteLength($node_route) 
 	{
 		$arr = preg_split('/\./', $node_route);
 		return count($arr)-1;
 	}
 
+	/**
+	 * @brief get node route
+	 */
 	function getNodeRoute($node_route, $length) 
 	{
 		$route = '';
 		$arr = preg_split('/\./', $node_route);
-		for ($i = 0; $i < (count($arr)-1); $i++) {
+		for ($i = 0; $i < (count($arr)-1); $i++) 
+		{
 			$route = $route . $arr[$i] . '.';
 			if ($i >= $length) break;
 		}
@@ -1001,14 +1053,19 @@ class nproductModel extends nproduct
 
 		$nr_length = $this->getNodeRouteLength($node_route);
 
-		for ($i = $nr_length-1; $i >= 0; $i--) {
+		for ($i = $nr_length-1; $i >= 0; $i--) 
+		{
 			$args->module_srl = $module_srls;
 			$args->node_route = $this->getNodeRoute($node_route, $i);
 			$args->list_count = $maxsize;
 			$output = executeQueryArray('nproduct.getDisplayItems', $args);
+			if(!$output->toBool()) return $output;
+
 			$tmp_items = $output->data;
-			if ($tmp_items) {
-				foreach ($tmp_items as $key=>$val) {
+			if ($tmp_items) 
+			{
+				foreach ($tmp_items as $key=>$val) 
+				{
 					//$items[$val->item_srl] = new nstore_coreItem($val);
 					$items[$val->item_srl] = $val;
 					if (count($items) >= $maxsize) break;
@@ -1023,11 +1080,17 @@ class nproductModel extends nproduct
 		return $display_categories;
 	}
 
+	/**
+	 * @brief get review count
+	 */
 	function getReviewCount() 
 	{
 		return 1;
 	}
 
+	/**
+	 * @brief get reviews
+	 */
 	function getReviews(&$item_info) 
 	{
 		if(!$this->getReviewCount()) return;
@@ -1041,7 +1104,8 @@ class nproductModel extends nproduct
 		// Create commentItem object from a comment list
 		// If admin priviledge is granted on parent posts, you can read its child posts.
 		$accessible = array();
-		foreach($output->data as $key => $val) {
+		foreach($output->data as $key => $val) 
+		{
 			$oStoreReviewItem = new store_reviewItem();
 			$oStoreReviewItem->setAttribute($val);
 			// If permission is granted to the post, you can access it temporarily
@@ -1059,6 +1123,9 @@ class nproductModel extends nproduct
 		return $review_list;
 	}
 
+	/**
+	 * @brief get options
+	 */
 	function getOptions($item_srl)
 	{
 		$args->item_srl = $item_srl;
@@ -1072,20 +1139,18 @@ class nproductModel extends nproduct
 		return $options;
 	}
 
+	/**
+	 * @brief get category list
+	 */
 	function getNproductCategoryList() 
 	{
 		$module_srl = Context::get('module_srl');
 		$node_id = Context::get('node_id');
 
-		debugPrint('getNproductCategoryList');
-		debugPrint($node_id);
-		debugPrint($module_srl);
-
 		$logged_info = Context::get('logged_info');
 		if (!$logged_info) return new Object(-1, 'msg_login_required');
 
 		$data = array();
-
 		if ($node_id=='root') 
 		{
 			$obj = new StdClass();
@@ -1151,10 +1216,8 @@ class nproductModel extends nproduct
 				$data[] = $obj;
 			}
 		}
-		debugPrint($data);
 		$this->add('data', $data);
 	}
-
 
 	/**
 	 * @brief category info.
@@ -1166,22 +1229,27 @@ class nproductModel extends nproduct
 
 		$node_id = Context::get('node_id');
 
-		if ($node_id == 'f.') {
+		if ($node_id == 'f.') 
+		{
 			$category_info->node_id = 'f.';
 			$category_info->node_route = 'f.';
 			$category_info->node_route_text = Context::getLang('category');
 			$category_info->category_name = Context::getLang('category');
 			$category_info->regdate = '';
-		} else {
+		} 
+		else 
+		{
 			$args->node_id = $node_id;
 			$output = executeQuery('nproduct.getCategoryInfo', $args);
 			if (!$output->toBool()) return $output;
 			$category_info = $output->data;
 		}
-
 		$this->add('data', $category_info);
 	}
 
+	/**
+	 * @brief get display items
+	 */
 	function getNproductDisplayItems() 
 	{
 		$category_srl = Context::get('category_srl');
@@ -1190,40 +1258,40 @@ class nproductModel extends nproduct
 		$this->add('data', $output->data);
 	}
 
+	/**
+	 * @brief get extra vars
+	 */
 	function getNproductExtraVars($module_name=null, $item_srl=null)
 	{
+		$oModel = &getModel($module_name);
 		if(!$module_name && !$item_srl) return;
-		else
+
+		if($item_srl)
 		{
-			if($item_srl)
+			$args->item_srl = $item_srl;
+			$output = executeQueryArray("nproduct.getNproductExtraVars",$args);
+			if(!$output->toBool()) return $output;
+			if($output->data) 
 			{
-				$args->item_srl = $item_srl;
-				$output = executeQueryArray("nproduct.getNproductExtraVars",$args);
-				if($output->data) 
+				foreach($output->data as $k => $v)
 				{
-					foreach($output->data as $k => $v)
-					{
-						$extra_values[$v->name] = $v->value;
-					}
-					Context::set('extra_values', $extra_values);
+					$extra_values[$v->name] = $v->value;
 				}
-				if(!$module_srl) return $extra_values;
+				Context::set('extra_values', $extra_values);
 			}
+			if(!$module_srl) return $extra_values;
+		}
 
-			if($module_name)
-			{
-				$oModel = &getModel($module_name);
-				//$oModel->get.ucfirst($module_name).ExtraVars();
-
-				$output = $oModel->getNproductExtraVars();
-				//$output = $this->getNproductInputExtraVars($output);
-
-				return $output;
-			}
+		if($module_name)
+		{
+			$output = $oModel->getNproductExtraVars();
+			return $output;
 		}
 	}
 
-
+	/**
+	 * @brief get input extra vars
+	 */
 	function getNproductInputExtraVars($extra_info)
 	{
 		$extend_form_list = $extra_info;
@@ -1234,20 +1302,14 @@ class nproductModel extends nproduct
 			return $formTags;
 		}
 
-		foreach ($extend_form_list as $no=>$formInfo) {
+		foreach ($extend_form_list as $no=>$formInfo) 
+		{
 			unset($formTag);
 			$inputTag = '';
 			$formTag = $formInfo;
 			$formTag->title = $formInfo->column_title;
 			if($formInfo->required=='Y') 
-			{
 				$formTag->title = $formTag->title.' <em style="color:red">*</em>';
-			}
-/*
-			$formTag->column_name = $formInfo->column_name;
-			$formTag->column_title = $formInfo->column_title;
-			$formTag->description = $formInfo->description;
-*/
 
 			$extendForm = $formInfo;
 			$replace = array('column_name' => $extendForm->column_name,
@@ -1275,7 +1337,8 @@ class nproductModel extends nproduct
 				if($extendForm->default_value)
 				{
 					$__i = 0;
-					foreach($extendForm->default_value as $v){
+					foreach($extendForm->default_value as $v)
+					{
 						$checked = '';
 						if(is_array($extendForm->value) && in_array($v, $extendForm->value))
 						{
@@ -1310,16 +1373,14 @@ class nproductModel extends nproduct
 				$optionTag = array();
 				if($extendForm->default_value)
 				{
-					foreach($extendForm->default_value as $v){
+					foreach($extendForm->default_value as $v)
+					{
 						if($v == $extendForm->value) 
 						{
 							$selected = 'selected="selected"';
 						}
 						else $selected = '';
-						$optionTag[] = sprintf('<option value="%s" %s >%s</option>'
-												,$v
-												,$selected
-												,$v);
+						$optionTag[] = sprintf('<option value="%s" %s >%s</option>' ,$v ,$selected ,$v);
 					}
 				}
 				$template = sprintf($template, implode('', $optionTag));
@@ -1337,9 +1398,7 @@ class nproductModel extends nproduct
 				{
 					$file = $oFileModel->getFile($extendForm->value);
 					$template = '<p><a href="'.$file->download_url.'">'.$file->source_filename.'</a> ('.FileHandler::filesize($file->file_size).')</p>';
-
 				}
-
 				$template .= '<input type="file" name="%column_name%" />';
 			}
 
@@ -1351,9 +1410,7 @@ class nproductModel extends nproduct
 		}
 
 		return $formTags;
-
 	}
-
 
 	/**
 	 * @brief 해당 아이템(상품)의 확장변수 값을 리턴한다.
@@ -1396,6 +1453,9 @@ class nproductModel extends nproduct
 		return null;
 	}
 
+	/**
+	 * @brief get extra item by module srl
+	 */
 	function getItemExtraByModuleSrl($module_srl)
 	{
 		$args->module_srl = $module_srl;
@@ -1404,6 +1464,9 @@ class nproductModel extends nproduct
 		else return;
 	}
 
+	/**
+	 * @brief get item srl by item name
+	 */
 	function getItemSrlByItemName($item_name, $module_srl)
 	{
 		$args->item_name = $item_name;
@@ -1412,6 +1475,9 @@ class nproductModel extends nproduct
 		return $output;
 	}
 
+	/**
+	 * @brief get proc modules
+	 */
 	function getProcModules()
 	{
         // 상품타입 정보 가져오기
@@ -1456,7 +1522,6 @@ class nproductModel extends nproduct
 		if (!$logged_info) return new Object(-1, 'msg_login_required');
 
 		$data = array();
-
 		if ($node_id=='root') 
 		{
 			// get module instance list
@@ -1525,7 +1590,6 @@ class nproductModel extends nproduct
 			$obj->a_attr->item_srl = $val->item_srl;
 			$data[] = $obj;
 		}
-
 		echo json_encode($data);
 		exit();
 	}

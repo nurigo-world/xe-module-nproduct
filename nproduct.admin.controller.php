@@ -7,14 +7,16 @@
  */
 class nproductAdminController extends nproduct
 {
+	/**
+	 * @brief insert module config
+	 **/
 	function procNproductAdminConfig() 
 	{
+		$oModuleControll = getController('module');
 		$args = Context::getRequestVars();
 		
 		// save module configuration.
-		$oModuleControll = getController('module');
 		$output = $oModuleControll->insertModuleConfig('nproduct', $args);
-
 		$this->setMessage('success_updated');
 
 		if(!in_array(Context::getRequestMethod(),array('XMLRPC','JSON'))) 
@@ -24,7 +26,6 @@ class nproductAdminController extends nproduct
 		}
 	}
 
-
 	/**
 	 * @brief 모듈 환경설정값 쓰기
 	 **/
@@ -33,6 +34,7 @@ class nproductAdminController extends nproduct
 		// module 모듈의 model/controller 객체 생성
 		$oModuleController = &getController('module');
 		$oModuleModel = &getModel('module');
+		$oNproductModel = &getModel('nproduct');
 
 		// 게시판 모듈의 정보 설정
 		$args = Context::getRequestVars();
@@ -56,9 +58,7 @@ class nproductAdminController extends nproduct
 			$msg_code = 'success_registed';
 
 			$extra_module_info = $oModuleModel->getModuleInfoByMid($extra_var_info->mid);
-			$oNproductModel = &getModel('nproduct');
 			$default_extra_forms = $oNproductModel->getNproductExtraVars($extra_var_info->proc_module);
-
 			if($default_extra_forms)
 			{
 				foreach($default_extra_forms as $k=>$v)
@@ -83,10 +83,7 @@ class nproductAdminController extends nproduct
 			$msg_code = 'success_updated';
 		}
 
-		if(!$output->toBool())
-		{
-			return $output;
-		}
+		if(!$output->toBool()) return $output;
 
 		
 		$this->add('module_srl',$output->get('module_srl'));
@@ -96,16 +93,16 @@ class nproductAdminController extends nproduct
 		$this->setRedirectUrl($returnUrl);
 	}
 
+	/**
+	 * @brief delete module instance
+	 **/
 	function procNproductAdminDeleteModInst()
 	{
-		$module_srl = Context::get('module_srl');
-
 		$oModuleController = &getController('module');
+
+		$module_srl = Context::get('module_srl');
 		$output = $oModuleController->deleteModule($module_srl);
-		if(!$output->toBool())
-		{
-			return $output;
-		}
+		if(!$output->toBool()) return $output; 
 
 		$this->add('module', 'nproduct');
 		$this->add('page', Context::get('page'));
@@ -115,8 +112,13 @@ class nproductAdminController extends nproduct
 		$this->setRedirectUrl($returnUrl);
 	}
 
+	/**
+	 * @brief insert global group discount
+	 **/
 	function procNproductAdminGroupDiscount()
 	{
+		$oMemberModel = &getModel('member');
+
 		$module_srl = Context::get('module_srl');
 		// update group discount
 		$args->module_srl = $module_srl;
@@ -124,7 +126,6 @@ class nproductAdminController extends nproduct
 		if (!$output->toBool()) return $output;
 		unset($args);
 
-		$oMemberModel = &getModel('member');
 		$group_list = $oMemberModel->getGroups();
 		foreach ($group_list as $key=>$val)
 		{
@@ -143,11 +144,13 @@ class nproductAdminController extends nproduct
 		}
 
 		$this->setMessage('success_updated');
-
 		$returnUrl = getNotEncodedUrl('', 'module', Context::get('module'), 'act', 'dispNproductAdminGroupDiscount','module_srl',$module_srl);
 		$this->setRedirectUrl($returnUrl);
 	}
 
+	/**
+	 * @brief insert display category
+	 **/
 	function procNproductAdminInsertDisplayCategory() 
 	{
 		$args = Context::gets('category_srl','module_srl','category_name','thumbnail_width','thumbnail_height','num_columns','num_rows');
@@ -156,18 +159,12 @@ class nproductAdminController extends nproduct
 			$args->category_srl = getNextSequence();
 			$args->list_order = $args->category_srl;
 			$output = executeQuery('nproduct.insertDisplayCategory', $args);
-			if(!$output->toBool())
-			{
-				return $output;
-			}
+			if(!$output->toBool()) return $output;
 		} 
 		else 
 		{
 			$output = executeQuery('nproduct.updateDisplayCategory', $args);
-			if(!$output->toBool())
-			{
-				return $output;
-			}
+			if(!$output->toBool()) return $output;
 		}
 		if(!in_array(Context::getRequestMethod(),array('XMLRPC','JSON'))) 
 		{
@@ -177,39 +174,36 @@ class nproductAdminController extends nproduct
 		}
 	}
 
+	/**
+	 * @brief delete display category
+	 **/
 	function procNproductAdminDeleteDisplayCategory() 
 	{
 		$category_srl = Context::get('category_srl');
 		$args->category_srl = $category_srl;
 		$output = executeQuery('nproduct.deleteDisplayCategory', $args);
-		if(!$output->toBool())
-		{
-			return $output;
-		}
+		if(!$output->toBool()) return $output;
 
 		$args->category_srl = $category_srl;
 		$output = executeQuery('nproduct.deleteDisplayItems', $args);
-		if(!$output->toBool())
-		{
-			return $output;
-		}
+		if(!$output->toBool()) return $output;
 	}
 
+	/**
+	 * @brief delete extra item
+	 **/
 	function procNproductAdminDeleteItemExtra() 
 	{
+		$oNproductModel = &getModel('nproduct');
 		$module_srl = Context::get('module_srl');
 		
 		//DB 삭제부분
 		$args->extra_srl = Context::get('extra_srl');
 		$output = executeQuery('nproduct.deleteItemExtra', $args);
-		if(!$output->toBool())
-		{
-			return $output;
-		}
+		if(!$output->toBool()) return $output;
 		
 		//dynamic ruleset 재생성
-		$oNstore_coreModel = &getModel('nproduct');
-		$extra_vars = $oNstore_coreModel->getItemExtraFormList($module_srl);
+		$extra_vars = $oNproductModel->getItemExtraFormList($module_srl);
 		$this->_createInsertItemRuleset($extra_vars);
 
 		$this->setMessage('success_deleted');
@@ -220,6 +214,9 @@ class nproductAdminController extends nproduct
 		}
 	}
 
+	/**
+	 * @brief insert display item
+	 **/
 	function procNproductAdminInsertDisplayItem() 
 	{
 		$oNstore_coreModel = &getModel('nproduct');
@@ -227,16 +224,11 @@ class nproductAdminController extends nproduct
 		$module_srl = Context::get('module_srl');
 		$item_srl = Context::get('item_srl');
 		$category_srl = Context::get('category_srl');
-
-		if(!$item_srl)
-		{
-			return new Object(-1,'msg_no_items');
-		}
+		if(!$item_srl) return new Object(-1,'msg_no_items');
 
 		$item_srl = explode(',', $item_srl);
-		
-		$args->module_srl = $module_srl;
 		$args->item_srl = $item_srl;
+		$args->module_srl = $module_srl;
 
 		// get node_route
 		$category_info = $oNstore_coreModel->getCategoryInfo($category_srl);
@@ -251,29 +243,24 @@ class nproductAdminController extends nproduct
 			$args->node_route = $category_info->node_route . $category_info->node_id . '.';
 		}
 		
-		foreach($item_srl as $k => $v)
+		foreach($item_srl as $key => $val)
 		{
-			$args->item_srl = $v;
+			$args->item_srl = $val;
 			$output = executeQuery('nproduct.insertDisplayItem', $args);
 		}
-
-		if(!$output->toBool())
-		{
-			return $output;
-		}
+		if(!$output->toBool()) return $output;
 	}
 
+	/**
+	 * @brief delete display item
+	 **/
 	function procNproductAdminDeleteDisplayItem() 
 	{
 		$args->category_srl = Context::get('category_srl');
 		$args->item_srl = Context::get('item_srl');
 		$output = executeQuery('nproduct.deleteDisplayItem', $args);
-		if(!$output->toBool())
-		{
-			return $output;
-		}
+		if(!$output->toBool()) return $output;
 	}
-
 
 	/**
 	 * update display category list order
@@ -282,17 +269,16 @@ class nproductAdminController extends nproduct
 	{
 		$order = Context::get('order');
 		parse_str($order);
-
 		$idx = 1;
-		if(is_array($record)) 
+		if(!is_array($record)) return;
+
+		foreach ($record as $category_srl) 
 		{
-			foreach ($record as $category_srl) {
-				$args->category_srl = $category_srl;
-				$args->list_order = $idx;
-				$output = executeQuery('nproduct.updateDisplayCategoryListOrder', $args);
-				if (!$output->toBool()) return $output;
-				$idx++;
-			}
+			$args->category_srl = $category_srl;
+			$args->list_order = $idx;
+			$output = executeQuery('nproduct.updateDisplayCategoryListOrder', $args);
+			if (!$output->toBool()) return $output;
+			$idx++;
 		}
 	}
 
@@ -303,63 +289,62 @@ class nproductAdminController extends nproduct
 	{
 		$order = Context::get('order');
 		parse_str($order);
-
 		$idx = 1;
-		if(is_array($record)) 
+		if(!is_array($record)) return;
+
+		foreach ($record as $item_srl) 
 		{
-			foreach ($record as $item_srl) {
-				$args->item_srl = $item_srl;
-				$args->list_order = $idx;
-				$output = executeQuery('nproduct.updateDisplayItemListOrder', $args);
-				if(!$output->toBool())
-				{
-					return $output;
-				}
-				$idx++;
-			}
+			$args->item_srl = $item_srl;
+			$args->list_order = $idx;
+			$output = executeQuery('nproduct.updateDisplayItemListOrder', $args);
+			if(!$output->toBool()) return $output;
+			$idx++;
 		}
 	}
 
+	/**
+	 * @brief update extra item order
+	 **/
 	function procNproductAdminUpdateItemExtraOrder() 
 	{
 		$order = Context::get('order');
 		parse_str($order);
 		$idx = 1;
-		if(is_array($record))
+		if(!is_array($record)) return;
+
+		foreach ($record as $extra_srl) 
 		{
-			foreach ($record as $extra_srl) {
-				$args->extra_srl = $extra_srl;
-				$args->list_order = $idx;
-				$output = executeQuery('nproduct.updateItemExtraOrder', $args);
-				if(!$output->toBool())
-				{
-					return $output;
-				}
-				$idx++;
-			}
+			$args->extra_srl = $extra_srl;
+			$args->list_order = $idx;
+			$output = executeQuery('nproduct.updateItemExtraOrder', $args);
+			if(!$output->toBool()) return $output;
+			$idx++;
 		}
 	}
 
+	/**
+	 * @brief update item list order
+	 **/
 	function procNproductAdminUpdateItemListOrder() 
 	{
 		$order = Context::get('order');
 		parse_str($order);
 		$idx = 1;
-		if(is_array($record))
+		if(!is_array($record)) return;
+
+		foreach ($record as $item_srl) 
 		{
-			foreach ($record as $item_srl) {
-				$args->item_srl = $item_srl;
-				$args->list_order = $idx;
-				$output = executeQuery('nproduct.updateItemListOrder', $args);
-				if(!$output->toBool())
-				{
-					return $output;
-				}
-				$idx++;
-			}
+			$args->item_srl = $item_srl;
+			$args->list_order = $idx;
+			$output = executeQuery('nproduct.updateItemListOrder', $args);
+			if(!$output->toBool()) return $output;
+			$idx++;
 		}
 	}
 
+	/**
+	 * @brief update display category
+	 **/
 	function procNproductAdminUpdateDisplayCategory() 
 	{
 		$args->category_srl = Context::get('category_srl');
@@ -372,19 +357,20 @@ class nproductAdminController extends nproduct
 	}
 
 
+	/**
+	 * @brief insert extra item
+	 **/
 	function insertItemExtra($args)
 	{
-		$oNstore_coreModel = &getModel('nproduct');
+		$oNproductModel = &getModel('nproduct');
 		// Default values
+		$args->default_value = '';
 		if(in_array($args->column_type, array('checkbox','select','radio')) && count($args->default_value) ) 
 		{
 			$args->default_value = serialize($args->default_value);
 		} 
-		else 
-		{
-			$args->default_value = '';
-		}
-		// Fix if extra_srl exists. Add if not exists.
+
+		// Update if extra_srl exists, otherwise insert.
 		$isInsert;
 		if(!$args->extra_srl)
 		{
@@ -399,13 +385,10 @@ class nproductAdminController extends nproduct
 			$this->setMessage('success_updated');
 		}
 
-		if(!$output->toBool()) 
-		{
-			return $output;
-		}
+		if(!$output->toBool()) return $output;
 
 		// create dynamic ruleset
-		$extra_vars = $oNstore_coreModel->getItemExtraFormList($args->module_srl);
+		$extra_vars = $oNproductModel->getItemExtraFormList($args->module_srl);
 		$this->_createInsertItemRuleset($extra_vars);
 	}
 
@@ -428,6 +411,9 @@ class nproductAdminController extends nproduct
 		return FALSE;
 	}
 
+	/**
+	 * @brief insert extra item
+	 **/
 	function procNproductAdminInsertItemExtra() 
 	{
 		$oNstore_coreModel = &getModel('nproduct');
@@ -459,12 +445,15 @@ class nproductAdminController extends nproduct
 		}
 	}
 
+	/**
+	 * @brief insert delivery info
+	 **/
 	function procNproductAdminInsertDeliveryInfo() 
 	{
 		$args->module_srl = Context::get('module_srl');
 		$args->item_srl = Context::get('item_srl');
 		$args->delivery_info = Context::get('delivery_info');
-		// Fix if item_srl exists. Add if not exists.
+		// update if item_srl exists, otherwise return error.
 		if(!$args->item_srl)
 		{
 			return new Object(-1, 'msg_invalid_item');
@@ -485,6 +474,9 @@ class nproductAdminController extends nproduct
 		}
 	}
 
+	/**
+	 * @brief delete item
+	 **/
 	function procNproductAdminDeleteItem() 
 	{
 		$oDocumentController = &getController('document');
@@ -492,9 +484,8 @@ class nproductAdminController extends nproduct
 		$oNproductModel = &getModel('nproduct');
 		$oStore_reviewAdminController = &getAdminController('store_review');
 
-		$item_srl = Context::get('item_srl');
-
 		// get item info.
+		$item_srl = Context::get('item_srl');
 		$item_info = $oNproductModel->getItemInfo($item_srl);
 		if(!$item_info) return new Object(-1, 'msg_invalid_request');
 
@@ -534,6 +525,9 @@ class nproductAdminController extends nproduct
 		}
 	}
 
+	/**
+	 * @brief update item list
+	 **/
 	function procNproductAdminUpdateItemList() 
 	{
 		$oNproductController = &getController('nproduct');
@@ -612,42 +606,53 @@ class nproductAdminController extends nproduct
 		}
 	}
 
+	/**
+	 * @brief insert detail list config
+	 **/
 	function insertDetailListConfig()
 	{
+		$oModuleController = &getController('module');
+
 		$module_srl = Context::get('module_srl');
 		$list = explode(',',Context::get('list'));
 		if(!count($list)) return new Object(-1, 'msg_invalid_request');
 
 		$list_arr = array();
-		foreach($list as $val) {
+		foreach($list as $val) 
+		{
 			$val = trim($val);
 			if(!$val) continue;
+
 			if(substr($val,0,10)=='extra_vars') $val = substr($val,10);
 			$list_arr[] = $val;
 		}
 
-		$oModuleController = &getController('module');
 		$output = $oModuleController->insertModulePartConfig('nproduct.detail', $module_srl, $list_arr);
 		if(!$output->toBool()) return $output;
 		return new Object();
 	}
 
-
+	/**
+	 * @brief insert list config
+	 **/
 	function insertListConfig()
 	{
+		$oModuleController = &getController('module');
+
 		$module_srl = Context::get('module_srl');
 		$list = explode(',',Context::get('list'));
 		if(!count($list)) return new Object(-1, 'msg_invalid_request');
 
 		$list_arr = array();
-		foreach($list as $val) {
+		foreach($list as $val) 
+		{
 			$val = trim($val);
 			if(!$val) continue;
+
 			if(substr($val,0,10)=='extra_vars') $val = substr($val,10);
 			$list_arr[] = $val;
 		}
 
-		$oModuleController = &getController('module');
 		$output = $oModuleController->insertModulePartConfig('nproduct', $module_srl, $list_arr);
 		if(!$output->toBool()) return $output;
 		return new Object();
@@ -675,7 +680,9 @@ class nproductAdminController extends nproduct
 		$this->setRedirectUrl(Context::get('success_return_url'));
 	}
 
-
+	/**
+	 * @brief insert item
+	 **/
 	function procNproductAdminInsertItem() 
 	{
 		$oFileController = &getController('file');
@@ -755,22 +762,24 @@ class nproductAdminController extends nproduct
 
 		$this->setMessage('success_registed');
 
-		if(!in_array(Context::getRequestMethod(),array('XMLRPC','JSON'))) {
+		if(!in_array(Context::getRequestMethod(),array('XMLRPC','JSON'))) 
+		{
 			$returnUrl = Context::get('success_return_url') ? Context::get('success_return_url') : getNotEncodedUrl('', 'module',Context::get('module'),'act','dispNproductAdminUpdateItem','module_srl',Context::get('module_srl'),'item_srl',$item_srl);
 			$this->setRedirectUrl($returnUrl);
 			return;
 		}
 	}
 
+	/**
+	 * @brief update item
+	 **/
 	function procNproductAdminUpdateItem() 
 	{
+		$oMemberModel = &getModel('member');
 		$oDocumentModel = &getModel('document');
 		$oNproductModel = &getModel('nproduct');
 		$oDocumentController = &getController('document');
 
-		$logged_info = Context::get('logged_info');
-		if (!$logged_info) return new Object(-1, 'msg_login_required');
-		
 		$item_srl = Context::get('item_srl');
 		$module_srl = Context::get('disp_module_srl');
 		$item_name = Context::get('item_name');
@@ -796,10 +805,7 @@ class nproductAdminController extends nproduct
 		$doc_args->tags = Context::get('tag');
 		$doc_args->allow_comment = 'Y';
 		$output = $oDocumentController->updateDocument($oDocumentModel->getDocument($document_srl), $doc_args);
-		if (!$output->toBool())
-		{
-			return $output;
-		}
+		if (!$output->toBool()) return $output;
 
 		if(Context::get('delete_file'))
 		{
@@ -812,21 +818,13 @@ class nproductAdminController extends nproduct
 		$args->item_name = $item_name;
 		$args->item_code = $item_code;
 		$args->module_srl = $module_srl;
+		$args->node_route = 'f.';
 		if ($category_id)
 		{
 			$args->category_id = $category_id;
 			$category_info = $oNproductModel->getCategoryInfo($category_id);
-			if ($category_info)
-			{
-				$args->node_route = $category_info->node_route . $category_info->node_id . '.';
-			} else
-			{
-				$args->node_route = 'f.';
-			}
-		}
-		else
-		{
 			$args->node_route = 'f.';
+			if ($category_info) $args->node_route = $category_info->node_route . $category_info->node_id . '.';
 		}
 		$args->proc_module = Context::get('proc_module');
 		$args->document_srl = $document_srl;
@@ -854,11 +852,11 @@ class nproductAdminController extends nproduct
 		/*
 		 *  extra_vars update
 		 */
-		foreach($extra_vars as $k => $v)
+		foreach($extra_vars as $key => $val)
 		{
 			$ex_args->item_srl = $item_srl;
-			$ex_args->name = $k;
-			$ex_args->value = $v->getValuePlain();
+			$ex_args->name = $key;
+			$ex_args->value = $val->getValuePlain();
 
 			$output = executeQuery('nproduct.deleteNproductExtraVars', $ex_args);
 			if(!$output->toBool()) return $output;
@@ -870,7 +868,6 @@ class nproductAdminController extends nproduct
 		/* 
 		 * end
 		 */
-
 		$output = executeQuery('nproduct.updateItemAdmin', $args);
 		if (!$output->toBool()) return $output;
 
@@ -880,10 +877,11 @@ class nproductAdminController extends nproduct
 		if (!$output->toBool()) return $output;
 		unset($args);
 
-		$oMemberModel = &getModel('member');
 		$group_list = $oMemberModel->getGroups();
-		foreach ($group_list as $key=>$val) {
-			if (Context::get('group_discount_'.$val->group_srl)) {
+		foreach ($group_list as $key=>$val) 
+		{
+			if (Context::get('group_discount_'.$val->group_srl)) 
+			{
 				$opt = Context::get('group_opt_'.$val->group_srl);
 				if (!$opt) $opt='1';
 				$args->item_srl = $item_srl;
@@ -906,6 +904,9 @@ class nproductAdminController extends nproduct
 		$this->setRedirectUrl(getNotEncodedUrl('', 'module', Context::get('module'),'act','dispNproductAdminUpdateItem','module_srl',Context::get('module_srl'),'item_srl',$item_srl,'s_item_name',Context::get('s_item_name'),'category',Context::get('category')));
 	}
 
+	/**
+	 * @brief update item file
+	 **/
 	function procNproductAdminUpdateItemFile() 
 	{
 		$oFileController = &getController('file');
@@ -916,25 +917,19 @@ class nproductAdminController extends nproduct
 		{
 			$args->item_srl = Context::get('item_srl');
 			$output = executeQuery('nproduct.getItemInfo', $args);
-			if (!$output->toBool())
-			{
-				return $output;
-			}
+			if (!$output->toBool()) return $output;
+
 			$item_info = $output->data;
-// process for uploaded contents file.
+			// process for uploaded contents file.
 			if(is_uploaded_file($args->contents_file['tmp_name'])) 
 			{
 				// delete contents file
-				if($item_info->file_srl) 
-				{
-					$oFileController->deleteFile($item_info->file_srl);
-				}
+				if($item_info->file_srl) $oFileController->deleteFile($item_info->file_srl);
+				
 				// attach thumbnail
 				$output = $oFileController->insertFile($args->contents_file, $args->module_srl, $args->item_srl);
-				if(!$output || !$output->toBool())
-				{
-					return $output;
-				}
+				if(!$output || !$output->toBool()) return $output;
+
 				$args->file_srl = $output->get('file_srl');
 			}
 
@@ -942,16 +937,12 @@ class nproductAdminController extends nproduct
 			if(is_uploaded_file($args->thumbnail_image['tmp_name'])) 
 			{
 				// delete thumbnail
-				if($item_info->thumb_file_srl) 
-				{
-					$oFileController->deleteFile($item_info->thumb_file_srl);
-				}
+				if($item_info->thumb_file_srl) $oFileController->deleteFile($item_info->thumb_file_srl);
+
 				// attach thumbnail
 				$output = $oFileController->insertFile($args->thumbnail_image, $args->module_srl, $args->item_srl);
-				if(!$output || !$output->toBool())
-				{
-					return $output;
-				}
+				if(!$output || !$output->toBool()) return $output;
+
 				$args->thumb_file_srl = $output->get('file_srl');
 			}
 
@@ -962,8 +953,9 @@ class nproductAdminController extends nproduct
 		}
 	}
 
-
-
+	/**
+	 * @brief insert discount member
+	 **/
 	function procNproductAdminMemberDiscount()
 	{
 		$oMemberMedel = &getModel('member');
@@ -975,7 +967,6 @@ class nproductAdminController extends nproduct
 		if(!$member_srl) return new Object(-1,'존재하지 않는 ID입니다.');
 
 		$args->member_srl = $member_srl;
-
 		if(!$vars->discount)
 		{
 			// delete member_discount by no '$vars->discount'
@@ -985,15 +976,11 @@ class nproductAdminController extends nproduct
 			return;
 		}
 
-		// check member_srl
+		// check if member_srl is on discount
 		$output = executeQuery('nproduct.getMemberDiscount', $args);
 		if(!$output->toBool()) return $output;
-
-		if($output->data)
-		{
-			// delete member_discount
-			return new Object(-1, '할인적용중인 ID입니다. 삭제후 등록 해주세요.');
-		}
+		// delete member_discount
+		if($output->data) return new Object(-1, '할인적용중인 ID입니다. 삭제후 등록 해주세요.');
 
 		$args->discount = $vars->discount;
 		$args->opt = $vars->member_opt;
@@ -1002,42 +989,27 @@ class nproductAdminController extends nproduct
 		$output = executeQuery('nproduct.insertMemberDiscount', $args);
 		if(!$output->toBool()) return $output;
 
-/*
-		[member_id] => aaa
-		[member_opt] => 2
-		[member_discount] => bbb
-*/
-
-		
-
 		$this->setRedirectUrl(getNotEncodedUrl('', 'module', Context::get('module'),'act','dispNproductAdminMemberDiscount','module_srl',Context::get('module_srl')));
 	}
 
+	/**
+	 * @brief insert discount quntity
+	 **/
 	function procNproductAdminQuantityDiscount()
 	{
 		$oNproductModel = &getModel('nproduct');
 
 		$vars = Context::getRequestVars();
-
 		if(!$vars->item_code || !$vars->quantity || !$vars->discount) return new Object(-1,'상품코드와 수량 그리고 할인가를 입력해주세요.');
 
 		$item_info = $oNproductModel->getItemByCode($vars->item_code);
-
 		$item_srl = $item_info->item_srl;
-
 		if(!$item_srl) return new Object(-1, '상품이 없습니다.');
 
 		$args->item_srl = $item_srl;
-
-		// check 
 		$output = executeQuery('nproduct.getQuantityDiscount', $args);
 		if(!$output->toBool()) return $output;
-
-		if($output->data)
-		{
-			// delete 
-			return new Object(-1, '할인적용중인 상품입니다. 삭제후 등록 해주세요.');
-		}
+		if($output->data) return new Object(-1, '할인적용중인 상품입니다. 삭제후 등록 해주세요.');
 
 		$args->quantity = $vars->quantity;
 		$args->discount = $vars->discount;
@@ -1045,31 +1017,26 @@ class nproductAdminController extends nproduct
 
 		// insert member_discount
 		$output = executeQuery('nproduct.insertQuantityDiscount', $args);
-
 		if(!$output->toBool()) return $output;
-/*
-		[member_id] => aaa
-		[member_opt] => 2
-		[member_discount] => bbb
-*/
 
 		$this->setRedirectUrl(getNotEncodedUrl('', 'module', Context::get('module'),'act','dispNproductAdminQuantityDiscount','module_srl',Context::get('module_srl')));
-
 	}
 
+	/**
+	 * @brief delete discount member
+	 **/
 	function procNproductAdminDeleteMemberDiscount()
 	{
 		$vars = Context::getRequestVars();
-
 		if(!$vars->member_srls)
 		{
 			$this->setRedirectUrl(getNotEncodedUrl('', 'module', Context::get('module'),'act','dispNproductAdminMemberDiscount','module_srl',Context::get('module_srl'))); 
 			return;
 		}
 
-		foreach($vars->member_srls as $k => $v)
+		foreach($vars->member_srls as $key => $val)
 		{
-			$args->member_srl = $v;
+			$args->member_srl = $val;
 			$output = executeQuery('nproduct.deleteMemberDiscount', $args);
 			if(!$output->toBool()) return $output;
 		}
@@ -1077,19 +1044,21 @@ class nproductAdminController extends nproduct
 		$this->setRedirectUrl(getNotEncodedUrl('', 'module', Context::get('module'),'act','dispNproductAdminMemberDiscount','module_srl',Context::get('module_srl'))); 
 	}
 
+	/**
+	 * @brief delete discount qunatity
+	 **/
 	function procNproductAdminDeleteQuantityDiscount()
 	{
 		$vars = Context::getRequestVars();
-
 		if(!$vars->item_srls)
 		{
 			$this->setRedirectUrl(getNotEncodedUrl('', 'module', Context::get('module'),'act','dispNproductAdminQuantityDiscount','module_srl',Context::get('module_srl')));
 			return;
 		}
 
-		foreach($vars->item_srls as $k => $v)
+		foreach($vars->item_srls as $key => $val)
 		{
-			$args->item_srl = $v;
+			$args->item_srl = $val;
 			$output = executeQuery('nproduct.deleteQuantityDiscount', $args);
 			if(!$output->toBool()) return $output;
 		}
@@ -1097,21 +1066,24 @@ class nproductAdminController extends nproduct
 		$this->setRedirectUrl(getNotEncodedUrl('', 'module', Context::get('module'),'act','dispNproductAdminQuantityDiscount','module_srl',Context::get('module_srl')));
 	}
 
+	/**
+	 * @brief delete file and update item info with null file_srl
+	 **/
 	function deleteNproductFile($file_srl, $item_srl)
 	{
-
 		$oFileController = &getController('file');
-
 		$oFileController->deleteFile($file_srl);
 
 		$args->file_srl = null;
 		$args->item_srl = $item_srl;
-
 		$output = executeQuery('nproduct.updateItemFile', $args);
 		if (!$output->toBool()) return $output;
 		return;
 	}
 
+	/**
+	 * @brief create insert item ruleset
+	 **/
 	function _createInsertItemRuleset($extra_vars)
 	{
 		$xml_file = './files/ruleset/nproduct_insertItem.xml';

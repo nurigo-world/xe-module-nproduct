@@ -20,8 +20,8 @@ class NExtraItemList
 		$formTags = array();
 		if($extend_form_list)
 		{
-			foreach ($extend_form_list as $no=>$field) {
-
+			foreach ($extend_form_list as $no=>$field) 
+			{
 				$extra_item = new NExtraItem($field->module_srl, $no, $field->column_name, $field->column_title, $field->column_type, $field->default_value, $field->description, $field->required, 'N', $field->value);
 				$formTags[] = $extra_item;
 			}
@@ -214,7 +214,7 @@ class NExtraItem
 
 
 	/**
-	 * Returns a given value converted based on its type
+	 * Returns a converted value based on its given type
 	 *
 	 * @param string $type Type of variable
 	 * @param string $value Value
@@ -304,6 +304,7 @@ class NExtraItem
 
 			case 'date' :
 				return str_replace('-', '', $value);
+
 			//case 'email_address' :
 			//case 'text' :
 			//case 'textarea' :
@@ -378,7 +379,7 @@ class NExtraItem
 	/**
 	 * Returns a form based on its type
 	 *
-	 * @return string Returns a form html.
+	 * @return string Returns a html form.
 	 */
 	function getFormHTML($include_desc=TRUE)
 	{
