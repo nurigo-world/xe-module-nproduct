@@ -6,12 +6,19 @@
 <load target="../../tpl/skin.js/script.js" />
 <load target="../../tpl/skin.js/scroll.js" />
 <load target="../../tpl/skin.js/itemdetail.js" />
+<load target="../../../elearning/starplayer/js/starplayer_config.js" type="body" />
+<load target="../../../elearning/starplayer/js/starplayer.js" type="body" />
+<load target="../../../elearning/starplayer/js/starplayer_popup.js" type="body" />
+<load target="../../../elearning/tpl/skin.js/player_popup.js" type="body" />
 <load target="../../tpl/skin.filter/insert_comment.xml" />
 <load target="../../tpl/skin.filter/insert_review.xml" />
 
 <include target="header.html" />
 <include target="categorylist.html" />
 <load target="lang" />
+
+<block>{@$oElearningModel = &getModel('elearning')}</block>
+<block>{@$config = $oElearningModel->getModuleConfig()}</block>
 
 <script>
 	var g_discounted_price = {$item_info->getDiscountedPrice()};
@@ -46,7 +53,7 @@
 				<tr>
 					<td colspan="3" style="border:0;">
 						<div class="subtitle">{$item_info->subtitle}</div>
-						<h2 class="product_name">{$item_info->item_name}</h2><a cond="$sample_content" href="{getUrl('act','dispElearningViewContent','content_srl',$sample_content->content_srl,'hide_trolley','true')}" onclick="winopen(this.href, '_view', 'width=1028,height=498,scrollbars=yes,resizable=yes,toolbars=no');return false;"><span class="sample_view">{$lang->sample_view}</span></a>
+						<h2 class="product_name">{$item_info->item_name}</h2><a cond="$sample_content" href="{getUrl('act','dispElearningViewContent','content_srl',$sample_content->content_srl,'hide_trolley','true')}" onclick="winopen(this.href, '_view', 'width={$config->player_screen_width},height={$config->player_screen_height},scrollbars=yes,resizable=yes,toolbars=no');return false;"><span class="sample_view">{$lang->sample_view}</span></a>
 					</td>
 				</tr>
 				<tr cond="!$discount_amount">
@@ -143,8 +150,8 @@
 				<td>{$val->content_title}</td>
 				<td>{$val->minutes}</td>
 				<td>
-					<a cond="$val->is_sample=='Y'" href="{getUrl('act','dispElearningViewContent','content_srl',$val->content_srl,'hide_trolley','true')}" onclick="winopen(this.href, '_view', 'width=1028,height=498,scrollbars=yes,resizable=yes,toolbars=no');return false;">{$lang->sample_view}</a>
-					<a cond="$val->is_sample!='Y' && $module_info->play_test=='Y' && $logged_info->is_admin=='Y'" href="{getUrl('act','dispElearningViewContent','content_srl',$val->content_srl,'hide_trolley','true')}" onclick="winopen(this.href, '_view', 'width=1028,height=498,scrollbars=yes,resizable=yes,toolbars=no');return false;">Play to test</a>
+					<a cond="$val->is_sample=='Y'" href="{getUrl('act','dispElearningViewContent','content_srl',$val->content_srl,'hide_trolley','true')}" onclick="winopen(this.href, '_view', 'width={$config->player_screen_width},height={$config->player_screen_height},scrollbars=yes,resizable=yes,toolbars=no');return false;">{$lang->sample_view}</a>
+					<a cond="$val->is_sample!='Y' && $module_info->play_test=='Y' && $logged_info->is_admin=='Y'" href="{getUrl('act','dispElearningViewContent','content_srl',$val->content_srl,'hide_trolley','true')}" onclick="winopen(this.href, '_view', 'width={$config->player_screen_width},height={$config->player_screen_height},scrollbars=yes,resizable=yes,toolbars=no');return false;">Play to test</a>
 				</td>
 			</tr>
 		</tbody>
